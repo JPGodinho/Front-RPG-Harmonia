@@ -1,0 +1,17 @@
+@import "tailwindcss";
+
+@theme {
+  --color-harmonia-bg: #212121;
+  --color-harmonia-purple: #E300FF;
+  --color-harmonia-gray: #BDBDBD;
+  --color-harmonia-purple-glow: #8A38F5;
+}
+
+:root {
+  --foreground-rgb: 255, 255, 255;
+}
+
+body {
+  background-color: var(--color-harmonia-bg);
+  color: #fff;
+}
