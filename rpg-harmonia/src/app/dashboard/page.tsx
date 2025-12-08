@@ -1,85 +1,80 @@
 "use client";
-import { Menu, User, LogOut } from "lucide-react";
+import { useState, useEffect } from "react";
+import { Plus } from "lucide-react";
 import { useRouter } from "next/navigation";
 
-export default function Dashboard() {
-  const router = useRouter();
+import { HeaderRoot } from "@/components/header/HeaderRoot";
+import { HeaderMenuButton, HeaderLogoutButton } from "@/components/header/HeaderButtons";
+import { Button } from "@/components/ui/Button";
+import { CharacterCard } from "./components/CharacterCard";
+
+export default function DashboardPage() {
+  
+  const [nomeUsuario, setNomeUsuario] = useState("Agente"); 
+
+  useEffect(() => {
+    const nomeSalvo = localStorage.getItem("nomeUsuario");
+    if (nomeSalvo) {
+      setNomeUsuario(nomeSalvo);
+    }
+  }, []);
+
+  const meusPersonagens = [
+    { 
+      id: "1", 
+      nome: "Bernardo Petre Melo", 
+      campanha: "HARMONIA", 
+      criadoEm: "12/03/2025" 
+    },
+    { 
+      id: "2", 
+      nome: "Arthur Cervero", 
+      campanha: "CALAMIDADE", 
+      criadoEm: "10/03/2025" 
+    },
+  ];
 
   return (
-    <main className="min-h-screen bg-harmonia-bg text-white p-6">
+    <main className="min-h-screen bg-harmonia-bg text-white p-4 md:p-8">
       
-      <header className="flex flex-col gap-4 mb-10">
-        
-        <div className="flex items-center justify-between">
-          
-          <div className="flex items-center gap-4">
-            <button className="hover:bg-white/10 p-2 rounded-full transition-colors">
-              <Menu size={28} className="text-harmonia-purple" />
-            </button>
-            
-            <h1 className="text-2xl">
-              Olá <strong className="font-bold">Matheus</strong>
-            </h1>
-          </div>
+      <HeaderRoot 
+        left={<HeaderMenuButton onClick={() => alert("Menu Lateral")} />} 
+        right={<HeaderLogoutButton />}
+      >
 
-          <button 
-            onClick={() => router.push('/')} 
-            className="flex items-center gap-2 text-sm text-gray-400 hover:text-white hover:bg-white/10 px-3 py-2 rounded-lg transition-all"
-            title="Sair da conta"
-          >
-            <span className="hidden sm:inline">Sair</span>
-            <LogOut size={20} />
-          </button>
+        <span>Olá, <span className="text-harmonia-purple capitalize">{nomeUsuario}</span></span>
+      </HeaderRoot>
 
+      <section className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
+        <div>
+          <h2 className="text-xl font-bold">Seus Agentes</h2>
+          <p className="text-sm text-gray-400">Gerencie suas fichas e evolua seus agentes.</p>
         </div>
-        
-        <div className="h-0.5 w-full bg-harmonia-purple shadow-[0_0_10px_#E300FF]" />
-      </header>
 
-      <section>
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="text-xl text-gray-300">Seus agentes</h2>
-          <button 
-              type="button" 
-              className="bg-white text-black font-bold h-10 rounded-lg min-w-fit px-5 hover:bg-gray-200 transition-transform active:scale-95"
-              onClick={() => {
-                router.push('/criar-agente');
-              }}
-            >
-              Criar Agente
-            </button>
-        </div>
-        <div className="border border-gray-600 rounded-2xl p-6 flex flex-col md:flex-row items-center gap-6 hover:border-harmonia-purple transition-colors cursor-pointer bg-[#2A2A2A]">
-          
-          <div className="w-20 h-20 bg-white rounded-full flex items-center justify-center text-black overflow-hidden shrink-0">
-            <User size={40} />
-          </div>
-
-          <div className="flex-1 grid grid-cols-2 gap-y-4 gap-x-8 w-full">
-            <div className="flex flex-col">
-              <span className="text-xs text-gray-400 uppercase tracking-wider">Personagem</span>
-              <span className="text-lg font-bold">Bernardo Melo</span>
-            </div>
-
-            <div className="flex flex-col">
-              <span className="text-xs text-gray-400 uppercase tracking-wider">Campanha</span>
-              <span className="text-lg font-bold uppercase">HARMONIA</span>
-            </div>
-
-            <div className="col-span-2 text-sm text-gray-400 mt-1">
-              Criado em: <span className="text-gray-200">25 dezembro 2025</span>
-            </div>
-          </div>
-
-          <button 
-            onClick={() => router.push('/ficha')}
-            className="bg-harmonia-purple hover:bg-harmonia-purple-glow text-white font-bold py-2 px-6 rounded-lg shadow-[0_0_15px_rgba(227,0,255,0.4)] transition-all active:scale-95 shrink-0"
-          >
-            Selecionar
-          </button>
-
-        </div>
+        <Button variant="secondary" onClick={() => alert("Em breve...")}>
+          <Plus size={20} />
+          Criar Novo Agente
+        </Button>
       </section>
+
+      {meusPersonagens.length > 0 ? (
+        <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {meusPersonagens.map((char) => (
+            <CharacterCard 
+              key={char.id}
+              id={char.id}
+              nome={char.nome}
+              campanha={char.campanha}
+              criadoEm={char.criadoEm}
+            />
+          ))}
+        </section>
+      ) : (
+        <div className="text-center py-20 border-2 border-dashed border-gray-800 rounded-xl">
+          <p className="text-gray-500">Você ainda não tem nenhum agente cadastrado.</p>
+        </div>
+      )}
+
     </main>
   );
 }
