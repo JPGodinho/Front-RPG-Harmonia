@@ -1,10 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
 import { Plus } from "lucide-react";
-import { useRouter } from "next/navigation";
-
-import { HeaderRoot } from "@/components/header/HeaderRoot";
-import { HeaderMenuButton, HeaderLogoutButton } from "@/components/header/HeaderButtons";
 import { Button } from "@/components/ui/Button";
 import { CharacterCard } from "./components/CharacterCard";
 
@@ -36,14 +32,6 @@ export default function DashboardPage() {
 
   return (
     <main className="min-h-screen bg-harmonia-bg text-white p-4 md:p-8">
-      
-      <HeaderRoot 
-        left={<HeaderMenuButton onClick={() => alert("Menu Lateral")} />} 
-        right={<HeaderLogoutButton />}
-      >
-
-        <span>Olá, <span className="text-harmonia-purple capitalize">{nomeUsuario}</span></span>
-      </HeaderRoot>
 
       <section className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
         <div>

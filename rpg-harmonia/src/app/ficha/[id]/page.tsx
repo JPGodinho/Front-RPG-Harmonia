@@ -4,8 +4,6 @@ import { InfoPersonagem } from "../components/InfoPersonagem";
 import { StatusBars } from "../components/StatusBars";
 import { AtributosGrid } from "../components/AtributosGrid";
 import { StatusSecundarios } from "../components/StatusSecundarios";
-import { HeaderRoot } from "@/components/header/HeaderRoot";
-import { HeaderBackButton, HeaderLogoutButton } from "@/components/header/HeaderButtons";
 import { bancoDePersonagens } from "@/lib/personagens";
 import { useParams } from "next/navigation";
 
@@ -33,15 +31,7 @@ export default function FichaPage() {
     }
 
   return (
-    <main className="min-h-screen bg-harmonia-bg text-white p-4 pb-20">
-      
-      <HeaderRoot 
-        left={<HeaderBackButton />} 
-        right={<HeaderLogoutButton />}
-      >
-        <h1>Ficha do Agente</h1>
-      </HeaderRoot>
-      <div className="h-px w-full mb-5 bg-harmonia-purple shadow-[0_0_8px_#E300FF]" />
+    <>
       <InfoPersonagem 
         nome={personagem.nome}
         idade={personagem.idade}
@@ -74,7 +64,6 @@ export default function FichaPage() {
         selecionado={atributoSelecionado} 
         onToggle={(nome) => setAtributoSelecionado(prev => prev === nome ? null : nome)} 
       />
-
-    </main>
+    </>
   );
 }
