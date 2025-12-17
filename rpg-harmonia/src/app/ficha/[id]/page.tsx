@@ -20,30 +20,29 @@ export default function FichaPage() {
       const encontrado = bancoDePersonagens.find(p => p.id === params.id);
       if (encontrado) {
         setPersonagem(encontrado);
-        setPv({ atual: encontrado.status.pv.atual, max: encontrado.status.pv.max });
-        setPe({ atual: encontrado.status.pe.atual, max: encontrado.status.pe.max });
-        setSan({ atual: encontrado.status.san.atual, max: encontrado.status.san.max });
+        setPv({ atual: encontrado.pontosDeVida.atual, max: encontrado.pontosDeVida.total });
+        setPe({ atual: encontrado.pontosDeEsforco.atual, max: encontrado.pontosDeEsforco.total });
+        setSan({ atual: encontrado.pontosDeSanidade.atual, max: encontrado.pontosDeSanidade.total });
       }
     }
-    }, [params.id]);
-    if (!personagem) {
-      return <div className="text-white p-10">Carregando agente...</div>;
-    }
+  }, [params.id]);
+
+  if (!personagem) {
+    return <div className="text-gray-400 text-center py-20">Carregando dados...</div>;
+  }
 
   return (
     <>
       <InfoPersonagem 
-        nome={personagem.nome}
-        idade={personagem.idade}
-        nex={personagem.nex}
-        peRodada={personagem.peRodada}
+        nome={personagem.personagem}
+        idade={`${personagem.idade} anos`}
+        nex={`${personagem.nivelExposicao}%`}
+        peRodada={personagem.esforcoPorRodada}
         origem={personagem.origem}
         classe={personagem.classe}
         trilha={personagem.trilha}
-        elemento={personagem.elemento}
+        elemento={personagem.afinidade}
       />
-
-      <div className="h-px w-full bg-harmonia-purple shadow-[0_0_10px_#E300FF] mb-8" />
 
       <StatusBars 
         pv={pv} pe={pe} san={san}
@@ -51,16 +50,22 @@ export default function FichaPage() {
       />
 
       <StatusSecundarios 
-        defesa={personagem.secundarios.defesa}
-        deslocamento={personagem.secundarios.deslocamento}
-        esquiva={personagem.secundarios.esquiva}
-        resistencias={personagem.secundarios.resistencias}
-        rdBloqueio={personagem.secundarios.rdBloqueio}
-        protecoes={personagem.secundarios.protecoes}
+        defesa={personagem.defesa}
+        deslocamento={personagem.deslocamento}
+        esquiva={personagem.defesaEsquiva}
+        resistencias={personagem.resistencia}
+        rdBloqueio={personagem.redDanoBloqueando}
+        protecoes={personagem.protecao}
       />
-
+      
       <AtributosGrid 
-        atributos={personagem.atributos}
+        atributos={{
+          agi: personagem.agilidade,
+          for: personagem.forca,
+          int: personagem.intelecto,
+          pre: personagem.presenca,
+          vig: personagem.vigor
+        }}
         selecionado={atributoSelecionado} 
         onToggle={(nome) => setAtributoSelecionado(prev => prev === nome ? null : nome)} 
       />

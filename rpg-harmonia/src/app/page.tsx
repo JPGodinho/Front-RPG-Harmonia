@@ -8,11 +8,10 @@ export default function LoginPage() {
   const [usuario, setUsuario] = useState("");
   const [senha, setSenha] = useState("");
 
-  const handleLogin = (e: React.FormEvent) => {
-    e.preventDefault();
-
+  const handleLogin = (e: React.MouseEvent) => {
     if (!usuario.trim() || !senha.trim()) {
-      alert("Por favor, preencha usuário e senha!");
+      alert("Preencha tudo!");
+      e.preventDefault();
       return;
     }
 
@@ -22,9 +21,11 @@ export default function LoginPage() {
 
     if (usuarioEncontrado) {
       localStorage.setItem("nomeUsuario", usuarioEncontrado.nomeUsuario);
+      localStorage.setItem("idUsuario", usuarioEncontrado.id);
       router.push("/dashboard");
     } else {
-      alert("Usuário ou senha incorretos!");
+      alert("Usuário ou senha errados!");
+      e.preventDefault();
     }
   };
 
