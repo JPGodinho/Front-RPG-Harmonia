@@ -1,38 +1,12 @@
 "use client";
-import { useState, useEffect } from "react";
 import { Plus } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { CharacterCard } from "./components/CharacterCard";
+import { bancoDePersonagens } from "@/lib/personagens";
 
 export default function DashboardPage() {
-  
-  const [nomeUsuario, setNomeUsuario] = useState("Agente"); 
-
-  useEffect(() => {
-    const nomeSalvo = localStorage.getItem("nomeUsuario");
-    if (nomeSalvo) {
-      setNomeUsuario(nomeSalvo);
-    }
-  }, []);
-
-  const meusPersonagens = [
-    { 
-      id: "1", 
-      nome: "Bernardo Petre Melo", 
-      campanha: "HARMONIA", 
-      criadoEm: "12/03/2025" 
-    },
-    { 
-      id: "2", 
-      nome: "Arthur Cervero", 
-      campanha: "CALAMIDADE", 
-      criadoEm: "10/03/2025" 
-    },
-  ];
-
   return (
-    <main className="min-h-screen bg-harmonia-bg text-white p-4 md:p-8">
-
+    <>
       <section className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
         <div>
           <h2 className="text-xl font-bold">Seus Agentes</h2>
@@ -45,9 +19,9 @@ export default function DashboardPage() {
         </Button>
       </section>
 
-      {meusPersonagens.length > 0 ? (
-        <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {meusPersonagens.map((char) => (
+      {bancoDePersonagens.length > 0 ? (
+        <section className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {bancoDePersonagens.map((char) => (
             <CharacterCard 
               key={char.id}
               id={char.id}
@@ -63,6 +37,6 @@ export default function DashboardPage() {
         </div>
       )}
 
-    </main>
+    </>
   );
 }

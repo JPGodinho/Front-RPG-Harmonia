@@ -62,5 +62,101 @@ export const bancoDePersonagens = [
       rdBloqueio: 10,
       protecoes: "Colete Pesado"
     }
+  },
+  {
+    id: "3",
+    nome: "Arthur Cervero",
+    classe: "Combatente",
+    trilha: "Tropa de Choque",
+    nex: "50%",
+    peRodada: 10,
+    origem: "Policial",
+    idade: "35 anos",
+    campanha: "CALAMIDADE",
+    criadoEm: "10/03/2025",
+    elemento: "Sangue",
+
+    atributos: {
+      agi: 1, for: 4, int: 1, pre: 2, vig: 3
+    },
+
+    status: {
+      pv: { atual: 80, max: 80 },
+      pe: { atual: 10, max: 10 },
+      san: { atual: 15, max: 30 },
+    },
+
+    secundarios: {
+      defesa: 22,
+      deslocamento: "9m/6q",
+      esquiva: 15,
+      resistencias: "Sangue 10",
+      rdBloqueio: 10,
+      protecoes: "Colete Pesado"
+    }
+  },
+  {
+    id: "4",
+    nome: "Arthur Cervero",
+    classe: "Combatente",
+    trilha: "Tropa de Choque",
+    nex: "50%",
+    peRodada: 10,
+    origem: "Policial",
+    idade: "35 anos",
+    campanha: "CALAMIDADE",
+    criadoEm: "10/03/2025",
+    elemento: "Sangue",
+
+    atributos: {
+      agi: 1, for: 4, int: 1, pre: 2, vig: 3
+    },
+
+    status: {
+      pv: { atual: 80, max: 80 },
+      pe: { atual: 10, max: 10 },
+      san: { atual: 15, max: 30 },
+    },
+
+    secundarios: {
+      defesa: 22,
+      deslocamento: "9m/6q",
+      esquiva: 15,
+      resistencias: "Sangue 10",
+      rdBloqueio: 10,
+      protecoes: "Colete Pesado"
+    }
+  },
+  {
+    id: "5",
+    nome: "Arthur Cervero",
+    classe: "Combatente",
+    trilha: "Tropa de Choque",
+    nex: "50%",
+    peRodada: 10,
+    origem: "Policial",
+    idade: "35 anos",
+    campanha: "CALAMIDADE",
+    criadoEm: "10/03/2025",
+    elemento: "Sangue",
+
+    atributos: {
+      agi: 1, for: 4, int: 1, pre: 2, vig: 3
+    },
+
+    status: {
+      pv: { atual: 80, max: 80 },
+      pe: { atual: 10, max: 10 },
+      san: { atual: 15, max: 30 },
+    },
+
+    secundarios: {
+      defesa: 22,
+      deslocamento: "9m/6q",
+      esquiva: 15,
+      resistencias: "Sangue 10",
+      rdBloqueio: 10,
+      protecoes: "Colete Pesado"
+    }
   }
 ];
