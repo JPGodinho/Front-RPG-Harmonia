@@ -3,6 +3,7 @@ import { Plus } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { CharacterCard } from "./components/CharacterCard";
 import { bancoDePersonagens } from "@/lib/personagens";
+import { formatarDataFirebase } from "@/lib/utils";
 
 export default function DashboardPage() {
   return (
@@ -27,7 +28,7 @@ export default function DashboardPage() {
               id={char.id}
               nome={char.nome}
               campanha={char.campanha}
-              criadoEm={char.criadoEm}
+              criadoEm={formatarDataFirebase(char.criadoEm)}
             />
           ))}
         </section>

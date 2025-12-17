@@ -9,7 +9,7 @@ export const bancoDePersonagens = [
     origem: "Acadêmico",
     idade: "22 anos",
     campanha: "HARMONIA",
-    criadoEm: "12/03/2025",
+    criadoEm: { seconds: 1741608000, nanos: 0 },
     elemento: "Energia",
     
     atributos: {
@@ -41,7 +41,7 @@ export const bancoDePersonagens = [
     origem: "Policial",
     idade: "35 anos",
     campanha: "CALAMIDADE",
-    criadoEm: "10/03/2025",
+    criadoEm: { seconds: 1741608000, nanos: 0 },
     elemento: "Sangue",
 
     atributos: {
@@ -73,7 +73,7 @@ export const bancoDePersonagens = [
     origem: "Policial",
     idade: "35 anos",
     campanha: "CALAMIDADE",
-    criadoEm: "10/03/2025",
+    criadoEm: { seconds: 1741608000, nanos: 0 },
     elemento: "Sangue",
 
     atributos: {
@@ -105,7 +105,7 @@ export const bancoDePersonagens = [
     origem: "Policial",
     idade: "35 anos",
     campanha: "CALAMIDADE",
-    criadoEm: "10/03/2025",
+    criadoEm: { seconds: 1741780800, nanos: 0 },
     elemento: "Sangue",
 
     atributos: {
@@ -137,7 +137,7 @@ export const bancoDePersonagens = [
     origem: "Policial",
     idade: "35 anos",
     campanha: "CALAMIDADE",
-    criadoEm: "10/03/2025",
+    criadoEm: { seconds: 1741608000, nanos: 0 },
     elemento: "Sangue",
 
     atributos: {

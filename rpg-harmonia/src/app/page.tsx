@@ -1,24 +1,31 @@
 "use client"; 
-import { useState, FormEvent } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Button } from "@/components/ui/Button";
+import { bancoDeUsuarios } from "@/lib/usuarios";
 
 export default function LoginPage() {
   const router = useRouter();
   const [usuario, setUsuario] = useState("");
   const [senha, setSenha] = useState("");
 
-  const handleLogin = (e?: FormEvent) => {
-    e?.preventDefault();
+  const handleLogin = (e: React.FormEvent) => {
+    e.preventDefault();
 
     if (!usuario.trim() || !senha.trim()) {
       alert("Por favor, preencha usuário e senha!");
       return;
     }
 
-    localStorage.setItem("nomeUsuario", usuario);
+    const usuarioEncontrado = bancoDeUsuarios.find(u => 
+      u.nomeUsuario === usuario && u.senha === senha
+    );
 
-    router.push('/dashboard');
+    if (usuarioEncontrado) {
+      localStorage.setItem("nomeUsuario", usuarioEncontrado.nomeUsuario);
+      router.push("/dashboard");
+    } else {
+      alert("Usuário ou senha incorretos!");
+    }
   };
 
   return (
@@ -35,7 +42,7 @@ export default function LoginPage() {
       <div className="w-full max-w-sm p-4">
         <h2 className="text-2xl font-bold text-center mb-6 text-white">Login</h2>
         
-        <form onSubmit={handleLogin} className="flex flex-col gap-5">
+        <form className="flex flex-col gap-5">
           
           <div className="flex flex-col gap-2">
             <label className="text-sm text-gray-400">Usuário</label>
@@ -59,14 +66,13 @@ export default function LoginPage() {
             />
           </div>
 
-          <Button 
-            type="submit" 
-            variant="secondary" 
-            className="mt-4 w-full h-12 text-base"
+          <button 
+            type="button"
+            onClick={handleLogin}
+            className="flex items-center justify-center gap-2 px-4 py-2 rounded-lg font-bold transition-all duration-200 bg-white text-black hover:bg-gray-200 shadow-[0_0_15px_rgba(255,255,255,0.2)] mt-4 w-full h-12 text-base"
           >
             Enviar
-          </Button>
-
+          </button>
         </form>
       </div>
     </main>
