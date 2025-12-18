@@ -5,11 +5,13 @@ import { StatusBars } from "../components/StatusBars";
 import { AtributosGrid } from "../components/AtributosGrid";
 import { StatusSecundarios } from "../components/StatusSecundarios";
 import { bancoDePersonagens } from "@/lib/personagens";
+import { bancoDePericias } from "@/lib/pericias";
 import { useParams } from "next/navigation";
 
 export default function FichaPage() {
   const params = useParams();
   const [personagem, setPersonagem] = useState<any>(null);
+  const [periciasDoPersonagem, setPericiasDoPersonagem] = useState<any>({});
   const [pv, setPv] = useState({ atual: 0, max: 0 });
   const [pe, setPe] = useState({ atual: 0, max: 0 });
   const [san, setSan] = useState({ atual: 0, max: 0 });
@@ -17,12 +19,21 @@ export default function FichaPage() {
 
   useEffect(() => {
     if (params.id) {
-      const encontrado = bancoDePersonagens.find(p => p.id === params.id);
-      if (encontrado) {
-        setPersonagem(encontrado);
-        setPv({ atual: encontrado.pontosDeVida.atual, max: encontrado.pontosDeVida.total });
-        setPe({ atual: encontrado.pontosDeEsforco.atual, max: encontrado.pontosDeEsforco.total });
-        setSan({ atual: encontrado.pontosDeSanidade.atual, max: encontrado.pontosDeSanidade.total });
+      const charEncontrado = bancoDePersonagens.find(p => p.id === params.id);
+      
+      if (charEncontrado) {
+        setPersonagem(charEncontrado);
+        setPv({ atual: charEncontrado.pontosDeVida.atual, max: charEncontrado.pontosDeVida.total });
+        setPe({ atual: charEncontrado.pontosDeEsforco.atual, max: charEncontrado.pontosDeEsforco.total });
+        setSan({ atual: charEncontrado.pontosDeSanidade.atual, max: charEncontrado.pontosDeSanidade.total });
+
+        const periciasEncontradas = bancoDePericias.find(p => p.characterId === charEncontrado.id);
+        
+        if (periciasEncontradas) {
+          setPericiasDoPersonagem(periciasEncontradas.porAtributo);
+        } else {
+          setPericiasDoPersonagem({});
+        }
       }
     }
   }, [params.id]);
@@ -66,6 +77,7 @@ export default function FichaPage() {
           pre: personagem.presenca,
           vig: personagem.vigor
         }}
+        pericias={periciasDoPersonagem}
         selecionado={atributoSelecionado} 
         onToggle={(nome) => setAtributoSelecionado(prev => prev === nome ? null : nome)} 
       />
