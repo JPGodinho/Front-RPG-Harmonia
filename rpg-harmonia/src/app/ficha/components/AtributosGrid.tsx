@@ -1,5 +1,6 @@
 "use client";
-import { PericiasList, PericiaData } from "./PericiasList";
+import { PericiasList } from "./PericiasList";
+import { Pericia } from "@/lib/pericias";
 
 interface AtributoBotaoProps { 
   label: string; 
@@ -36,43 +37,22 @@ function AtributoBotao({ label, valor, borderCor, bgCor, textCor, sombra, seleci
   );
 }
 
-interface TodasPericias {
-  agilidade?: PericiaData[];
-  forca?: PericiaData[];
-  intelecto?: PericiaData[];
-  presenca?: PericiaData[];
-  vigor?: PericiaData[];
-}
-
 interface AtributosGridProps {
   atributos: { agi: number; for: number; int: number; pre: number; vig: number };
-  pericias: TodasPericias;
+  listaPericiasAtual: Pericia[];
   selecionado: string | null;
   onToggle: (nome: string) => void;
 }
 
-export function AtributosGrid({ atributos, pericias, selecionado, onToggle }: AtributosGridProps) {
+export function AtributosGrid({ atributos, listaPericiasAtual, selecionado, onToggle }: AtributosGridProps) {
   const algoSelecionado = selecionado !== null;
 
-  let listaParaMostrar: PericiaData[] = [];
   let corTextoAtual = "text-gray-400";
-
-  if (selecionado === "Agilidade") {
-    listaParaMostrar = pericias.agilidade || [];
-    corTextoAtual = "text-cyan-400";
-  } else if (selecionado === "Força") {
-    listaParaMostrar = pericias.forca || [];
-    corTextoAtual = "text-orange-500";
-  } else if (selecionado === "Intelecto") {
-    listaParaMostrar = pericias.intelecto || [];
-    corTextoAtual = "text-yellow-400";
-  } else if (selecionado === "Presença") {
-    listaParaMostrar = pericias.presenca || [];
-    corTextoAtual = "text-harmonia-purple";
-  } else if (selecionado === "Vigor") {
-    listaParaMostrar = pericias.vigor || [];
-    corTextoAtual = "text-green-500";
-  }
+  if (selecionado === "Agilidade") corTextoAtual = "text-cyan-400";
+  else if (selecionado === "Força") corTextoAtual = "text-orange-500";
+  else if (selecionado === "Intelecto") corTextoAtual = "text-yellow-400";
+  else if (selecionado === "Presença") corTextoAtual = "text-harmonia-purple";
+  else if (selecionado === "Vigor") corTextoAtual = "text-green-500";
 
   return (
     <section className="max-w-3xl mx-auto mb-20">
@@ -115,7 +95,7 @@ export function AtributosGrid({ atributos, pericias, selecionado, onToggle }: At
         
         {selecionado && (
           <div key={selecionado} className="animacao-entrada px-2 md:px-0">
-             <PericiasList corTexto={corTextoAtual} lista={listaParaMostrar} />
+             <PericiasList corTexto={corTextoAtual} lista={listaPericiasAtual} />
           </div>
         )}
 
