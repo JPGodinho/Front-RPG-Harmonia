@@ -30,9 +30,9 @@ export function InfoPersonagem({
   if (elemento === "Energia") corElemento = "text-purple-500";
 
   return (
-    <section className="bg-[#1a1a1a] border border-gray-800 rounded-xl p-5 mb-6 shadow-lg relative overflow-hidden">
+    <section className="bg-[#1a1a1a] border border-gray-800 rounded-xl p-5 mb-3 shadow-lg relative overflow-hidden">
       
-      <div className="flex items-center gap-4 mb-5">
+      <div className="flex items-center gap-4 mb-1">
         
         <div className="w-16 h-16 rounded-full bg-gray-800 border-2 border-harmonia-purple flex items-center justify-center shrink-0 shadow-[0_0_15px_rgba(227,0,255,0.3)]">
           <User className="text-white w-8 h-8" />

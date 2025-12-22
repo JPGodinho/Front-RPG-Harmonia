@@ -4,7 +4,7 @@ import { HeaderBackButton, HeaderLogoutButton } from "@/components/header/Header
 
 export function HeaderFicha() {
   return (
-    <div className="flex flex-col mb-6">
+    <div className="flex flex-col mb-5">
       <HeaderRoot 
         left={<HeaderBackButton />} 
         right={<HeaderLogoutButton />}
