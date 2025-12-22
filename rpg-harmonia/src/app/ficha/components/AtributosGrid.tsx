@@ -1,4 +1,5 @@
 "use client";
+import { useRef, useEffect } from "react";
 import { PericiasList } from "./PericiasList";
 import { Pericia } from "@/lib/pericias";
 
@@ -47,6 +48,19 @@ interface AtributosGridProps {
 export function AtributosGrid({ atributos, listaPericiasAtual, selecionado, onToggle }: AtributosGridProps) {
   const algoSelecionado = selecionado !== null;
 
+  const listaRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (selecionado && listaPericiasAtual.length > 0) {
+      setTimeout(() => {
+        listaRef.current?.scrollIntoView({ 
+          behavior: "smooth",
+          block: "nearest"
+        });
+      }, 100);
+    }
+  }, [listaPericiasAtual, selecionado]);
+
   let corTextoAtual = "text-gray-400";
   if (selecionado === "Agilidade") corTextoAtual = "text-cyan-400";
   else if (selecionado === "Força") corTextoAtual = "text-orange-500";
@@ -91,7 +105,10 @@ export function AtributosGrid({ atributos, listaPericiasAtual, selecionado, onTo
          />
       </div>
 
-      <div className={`mt-6 transition-all duration-300 ease-in-out ${selecionado ? 'opacity-100 min-h-[200px]' : 'opacity-0 min-h-0'}`}>
+      <div 
+        ref={listaRef} 
+        className={`mt-6 transition-all duration-300 ease-in-out scroll-mt-20 ${selecionado ? 'opacity-100 min-h-[200px]' : 'opacity-0 min-h-0'}`}
+      >
         
         {selecionado && (
           <div key={selecionado} className="animacao-entrada px-2 md:px-0">
