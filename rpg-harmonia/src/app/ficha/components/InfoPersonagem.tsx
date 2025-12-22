@@ -1,4 +1,4 @@
-import { InfoDisplay } from "@/components/ui/InfoDisplay";
+"use client";
 import { User } from "lucide-react";
 
 interface InfoPersonagemProps {
@@ -9,49 +9,76 @@ interface InfoPersonagemProps {
   origem: string;
   classe: string;
   trilha: string;
-  elemento?: string;
+  elemento: string;
 }
 
-export function InfoPersonagem({ 
-  nome, idade, nex, peRodada, origem, classe, trilha, elemento 
+export function InfoPersonagem({
+  nome,
+  idade,
+  nex,
+  peRodada,
+  origem,
+  classe,
+  trilha,
+  elemento,
 }: InfoPersonagemProps) {
+  
+  let corElemento = "text-harmonia-purple";
+  if (elemento === "Sangue") corElemento = "text-red-600";
+  if (elemento === "Morte") corElemento = "text-gray-400";
+  if (elemento === "Conhecimento") corElemento = "text-yellow-500";
+  if (elemento === "Energia") corElemento = "text-purple-500";
 
   return (
-    <section className="flex flex-col md:flex-row gap-6 mb-8 items-center md:items-start">
+    <section className="bg-[#1a1a1a] border border-gray-800 rounded-xl p-5 mb-6 shadow-lg relative overflow-hidden">
       
-      <div className="w-24 h-24 md:w-28 md:h-28 bg-white rounded-full flex items-center justify-center text-black shrink-0 border-2 border-transparent shadow-[0_0_20px_rgba(255,255,255,0.1)]">
-        <User size={50} />
+      <div className="flex items-center gap-4 mb-5">
+        
+        <div className="w-16 h-16 rounded-full bg-gray-800 border-2 border-harmonia-purple flex items-center justify-center shrink-0 shadow-[0_0_15px_rgba(227,0,255,0.3)]">
+          <User className="text-white w-8 h-8" />
+        </div>
+
+        <div className="flex flex-col flex-1 text-center">
+           <div>
+              <span className="text-[10px] text-gray-500 uppercase tracking-wider font-bold">Personagem</span>
+              <h1 className="text-base md:text-lg font-bold text-white leading-tight wrap-break-word text-center">
+                {nome}
+              </h1>
+           </div>
+        </div>
+
+        <div className="flex flex-col items-center border-l border-gray-700 pl-6 shrink-0">
+            <span className="text-[10px] text-gray-500 uppercase tracking-wider font-bold">Idade</span>
+            <span className="text-xl font-bold text-white text-center">{idade}</span>
+        </div>
       </div>
 
-      <div className="flex-1 w-full grid grid-cols-4 gap-y-6 gap-x-2 text-center md:text-left">
+      <div className="border-t border-gray-800 pt-4 pb-4 grid grid-cols-3 gap-2 text-center relative">
         
-        <div className="col-span-2 md:col-span-1">
-          <InfoDisplay label="Personagem">{nome}</InfoDisplay>
-        </div>
-        <div className="col-span-1">
-          <InfoDisplay label="Idade">{idade}</InfoDisplay>
-        </div>
-        <div className="col-span-1">
-          <InfoDisplay label="NEX">{nex}</InfoDisplay>
-        </div>
-        <div className="col-span-1 hidden md:block"> 
-            <InfoDisplay label="PE/Rodada">{peRodada}</InfoDisplay>
-        </div>
-        <div className="col-span-2 md:hidden text-center md:text-left">
-            <InfoDisplay label="PE/Rodada">{peRodada}</InfoDisplay>
+        <div className="flex flex-col">
+           <span className="text-[10px] text-gray-500 uppercase tracking-wider">NEX</span>
+           <span className="text-lg font-bold text-white text-center">{nex}</span>
         </div>
 
-        <div className="col-span-2 md:col-span-1 text-center md:text-left">
-            <InfoDisplay label="Origem">{origem}</InfoDisplay>
-        </div>
-        
-        <div className="col-span-4 md:col-span-3">
-           <InfoDisplay label="Classe, Trilha e Afinidade">
-              {classe} de {trilha} - <span className="text-harmonia-purple font-bold">{elemento}</span>
-           </InfoDisplay>
+        <div className="flex flex-col border-x border-gray-800">
+           <span className="text-[10px] text-gray-500 uppercase tracking-wider">PE/Rodada</span>
+           <span className="text-lg font-bold text-yellow-400">{peRodada}</span>
         </div>
 
+        <div className="flex flex-col">
+           <span className="text-[10px] text-gray-500 uppercase tracking-wider">Origem</span>
+           <span className="text-sm md:text-lg font-bold text-white truncate px-1" title={origem}>
+             {origem}
+           </span>
+        </div>
       </div>
+
+      <div className="bg-black/30 rounded-lg p-2 text-center mt-1 border border-gray-800/50">
+        <span className="text-gray-300 text-xs md:text-sm font-medium">
+          {classe} de {trilha} <span className="text-gray-600 mx-1">•</span> <span className={`${corElemento} font-bold uppercase`}>{elemento}</span>
+        </span>
+      </div>
+
     </section>
   );
 }
