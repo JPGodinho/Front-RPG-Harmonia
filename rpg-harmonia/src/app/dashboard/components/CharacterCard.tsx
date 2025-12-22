@@ -25,7 +25,7 @@ export function CharacterCard({ id, nome, campanha, criadoEm }: CharacterCardPro
         <div className="flex flex-col gap-2 md:gap-3">
           <div className="flex flex-wrap gap-4 md:gap-8">
             <InfoDisplay label="Personagem">
-              <span className="truncate block max-w-[140px] md:max-w-[200px]">{nome}</span>
+              <span className=" block max-w-[140px] md:max-w-[200px]">{nome}</span>
             </InfoDisplay>
             
             <InfoDisplay label="Campanha">
