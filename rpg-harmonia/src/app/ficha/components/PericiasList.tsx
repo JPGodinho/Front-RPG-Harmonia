@@ -1,5 +1,5 @@
 "use client";
-import { Pericia } from "@/lib/pericias";
+import { Pericia } from "@/lib/types";
 
 interface PericiasListProps {
   corTexto: string; 

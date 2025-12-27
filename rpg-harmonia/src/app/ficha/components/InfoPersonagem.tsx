@@ -1,7 +1,7 @@
 "use client";
 
 interface InfoPersonagemProps {
-  urlPersonagem?: string;
+  imgPersonagem?: string;
   nome: string;
   idade: string;
   nex: string;
@@ -13,7 +13,7 @@ interface InfoPersonagemProps {
 }
 
 export function InfoPersonagem({
-  urlPersonagem,
+  imgPersonagem,
   nome,
   idade,
   nex,
@@ -25,10 +25,10 @@ export function InfoPersonagem({
 }: InfoPersonagemProps) {
   
   let corElemento = "text-harmonia-purple";
-  if (elemento === "Sangue") corElemento = "text-red-600";
-  if (elemento === "Morte") corElemento = "text-gray-400";
-  if (elemento === "Conhecimento") corElemento = "text-yellow-500";
-  if (elemento === "Energia") corElemento = "text-purple-500";
+  if (elemento === "SANGUE") corElemento = "text-red-600";
+  if (elemento === "MORTE") corElemento = "text-gray-400";
+  if (elemento === "CONHECIMENTO") corElemento = "text-yellow-500";
+  if (elemento === "ENERGIA") corElemento = "text-purple-500";
 
   return (
     <section className="bg-[#1a1a1a] border border-gray-800 rounded-xl p-5 mb-3 shadow-lg relative overflow-hidden">
@@ -36,7 +36,7 @@ export function InfoPersonagem({
       <div className="flex items-center gap-4 mb-1">
         
         <div className="w-16 h-16 rounded-full bg-gray-800 border-2 border-harmonia-purple flex items-center justify-center shrink-0 shadow-[0_0_15px_rgba(227,0,255,0.3)]">
-          <img src={urlPersonagem} alt="Personagem" className="w-full h-full object-cover rounded-full" />
+          <img src={imgPersonagem} alt="Personagem" className="w-full h-full object-cover rounded-full" />
         </div>
 
         <div className="flex flex-col flex-1 text-center">

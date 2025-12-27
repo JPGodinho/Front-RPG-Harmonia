@@ -1,6 +1,6 @@
 'use server';
 
-import { LoginFormSchema, FormState } from '@/lib/definitions';
+import { LoginFormSchema, FormState, SignupFormSchema } from '@/lib/definitions';
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 
@@ -78,4 +78,65 @@ export async function logout() {
 
   // Redireciona para o login
   redirect('/login');
+}
+
+export async function signup(prevState: FormState, formData: FormData) {
+  // 1. Valida os campos
+  const validatedFields = SignupFormSchema.safeParse({
+    nomeUsuario: formData.get('nomeUsuario'),
+    senha: formData.get('senha'),
+    tipoUsuario: formData.get('tipoUsuario'),
+  });
+
+  if (!validatedFields.success) {
+    return {
+      errors: validatedFields.error.flatten().fieldErrors,
+    };
+  }
+
+  const { nomeUsuario, senha, tipoUsuario } = validatedFields.data;
+
+  try {
+    // 2. Chama a API de Cadastro
+    const response = await fetch("https://harmonia-rpg.onrender.com/api/v1/auth/cadastrar", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ nomeUsuario, senha, tipoUsuario }),
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      return { message: data.message || 'Erro ao criar conta. Tente outro nome de usuário.' };
+    }
+
+    // 3. Sucesso! Configura os cookies (IGUAL AO LOGIN)
+    const cookieStore = await cookies();
+    
+    // Cookie de Segurança
+    cookieStore.set('auth_token', data.token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      maxAge: 60 * 60 * 24,
+      path: '/',
+    });
+
+    // Cookies de Dados (ID e Nome)
+    cookieStore.set('user_name', data.nomeUsuario, {
+       maxAge: 60 * 60 * 24, 
+       path: '/' 
+    });
+    
+    cookieStore.set('user_id', data.id, {
+        maxAge: 60 * 60 * 24,
+        path: '/'
+    });
+
+  } catch (error) {
+    console.error("Erro no cadastro:", error);
+    return { message: 'Erro de conexão com o servidor.' };
+  }
+
+  // 4. Redireciona
+  redirect('/dashboard');
 }
