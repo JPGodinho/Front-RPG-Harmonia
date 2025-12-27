@@ -3,8 +3,8 @@ import { useState, useEffect } from "react";
 import { Plus } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { CharacterCard } from "./components/CharacterCard";
-import { bancoDePersonagens } from "@/lib/personagens";
-import { formatarDataFirebase } from "@/lib/utils";
+import { formatarDataFirestore } from "@/lib/utils"; // Use a função de data que criamos antes
+import { buscarMeusAgentes } from "./actions"; // Importa a action criada acima
 
 export default function DashboardPage() {
   
@@ -12,15 +12,16 @@ export default function DashboardPage() {
   const [carregando, setCarregando] = useState(true);
 
   useEffect(() => {
-    const idUsuarioLogado = localStorage.getItem("idUsuario");
+    // Função assíncrona para buscar os dados
+    const carregarDados = async () => {
+      // Chama a Server Action (que lê os cookies seguros)
+      const dados = await buscarMeusAgentes();
+      
+      setMeusPersonagens(dados);
+      setCarregando(false);
+    };
 
-    if (idUsuarioLogado) {
-      const fichasFiltradas = bancoDePersonagens.filter(
-        (ficha) => ficha.idUsuario === idUsuarioLogado
-      );
-      setMeusPersonagens(fichasFiltradas);
-    }
-    setCarregando(false);
+    carregarDados();
   }, []);
 
   return (
@@ -45,7 +46,8 @@ export default function DashboardPage() {
               id={char.id}
               nome={char.personagem} 
               campanha={char.nomeCampanha}
-              criadoEm={formatarDataFirebase(char.criadoEm)} 
+              // O utils 'formatarDataFirestore' deve estar preparado para { seconds, nanos }
+              criadoEm={formatarDataFirestore(char.criadoEm)} 
             />
           ))}
         </section>

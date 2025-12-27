@@ -3,6 +3,7 @@ import { Menu, LogOut, ChevronLeft } from "lucide-react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import router from "next/dist/shared/lib/router/router";
+import { logout } from "@/actions/auth";
 
 export function HeaderBackButton() {
   const router = useRouter();
@@ -31,24 +32,17 @@ export function HeaderMenuButton({ onClick }: { onClick?: () => void }) {
 
 
 export function HeaderLogoutButton() {
-  const router = useRouter();
-  const handleLogout = () => {
-    // A mesma lógica de logout
-    document.cookie = "auth_token=; path=/; max-age=0";
-    localStorage.removeItem("nomeUsuario");
-    localStorage.removeItem("idUsuario");
-    router.push("/login");
-  };
   return (
     <button 
-        onClick={handleLogout}
-        className="flex items-center gap-2 text-gray-500 hover:text-red-500 transition-colors group"
-        title="Desconectar"
-      >
-        <span className="text-xs font-bold uppercase tracking-wider hidden md:inline">Sair</span>
-        <div className="w-8 h-8 rounded-full bg-[#1a1a1a] border border-gray-800 flex items-center justify-center group-hover:border-red-900 group-hover:bg-red-900/10 transition-colors">
-          <LogOut size={16} />
-        </div>
-      </button>
+      // Chama a server action diretamente no onClick
+      onClick={() => logout()} 
+      className="flex items-center gap-2 text-gray-500 hover:text-red-500 transition-colors group"
+      title="Desconectar"
+    >
+      <span className="text-xs font-bold uppercase tracking-wider hidden md:inline">Sair</span>
+      <div className="w-8 h-8 rounded-full bg-[#1a1a1a] border border-gray-800 flex items-center justify-center group-hover:border-red-900 group-hover:bg-red-900/10 transition-colors">
+        <LogOut size={16} />
+      </div>
+    </button>
   );
 }
