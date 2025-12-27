@@ -1,0 +1,32 @@
+'use server';
+
+import { cookies } from 'next/headers';
+import { ListaDePericias } from '@/lib/types';
+
+export async function buscarPericiasDaFicha(idFicha: string): Promise<ListaDePericias | null> {
+  const cookieStore = await cookies();
+  const token = cookieStore.get("auth_token")?.value;
+
+  if (!token) return null;
+
+  try {
+    const res = await fetch(`https://harmonia-rpg.onrender.com/api/v1/ficha/${idFicha}/atributos`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`
+      },
+      next: { revalidate: 60 } 
+    });
+
+    if (!res.ok) {
+      console.error("Erro ao buscar perícias:", res.status);
+      return null;
+    }
+
+    return await res.json();
+  } catch (error) {
+    console.error("Erro de conexão nas perícias:", error);
+    return null;
+  }
+}

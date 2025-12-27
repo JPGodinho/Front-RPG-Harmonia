@@ -1,16 +1,12 @@
-"use client";
-import { useState, useEffect } from "react";
+// src/app/dashboard/components/DashboardHeader.tsx
 import { HeaderRoot } from "@/components/header/HeaderRoot";
 import { HeaderMenuButton, HeaderLogoutButton } from "@/components/header/HeaderButtons";
 
-export function DashboardHeader() {
-  const [nomeUsuario, setNomeUsuario] = useState("Agente");
+interface DashboardHeaderProps {
+  nomeUsuario: string;
+}
 
-  useEffect(() => {
-    const nomeSalvo = localStorage.getItem("nomeUsuario");
-    if (nomeSalvo) setNomeUsuario(nomeSalvo);
-  }, []);
-
+export function DashboardHeader({ nomeUsuario }: DashboardHeaderProps) {
   return (
     <HeaderRoot 
       left={<HeaderMenuButton />} 

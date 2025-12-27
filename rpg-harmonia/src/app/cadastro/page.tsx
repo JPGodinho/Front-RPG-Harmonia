@@ -1,37 +1,14 @@
 "use client"; 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useActionState } from "react";
 import Link from "next/link";
+import { signup } from "@/actions/auth";
 
 export default function CadastroPage() {
-  const router = useRouter();
-  const [usuario, setUsuario] = useState("");
-  const [senha, setSenha] = useState("");
-  // Mudei o estado inicial para "JOGADOR"
-  const [tipo, setTipo] = useState("JOGADOR"); 
-
-  const handleCadastro = (e: React.MouseEvent) => {
-    e.preventDefault();
-
-    if (!usuario.trim() || !senha.trim()) {
-      alert("Preencha todos os campos!");
-      return;
-    }
-
-    // SIMULAÇÃO DE CADASTRO
-    console.log("Novo Usuário:", { usuario, senha, tipo });
-    
-    // Cria o cookie para logar direto
-    document.cookie = `auth_token=NOVO_ID_GERADO; path=/; max-age=86400;`;
-    
-    // Redireciona para o Dashboard
-    router.push("/dashboard");
-  };
+  const [state, action, pending] = useActionState(signup, undefined);
 
   return (
     <main className="min-h-screen bg-harmonia-bg text-white flex flex-col items-center gap-10 p-4">
       
-      {/* Cabeçalho igual ao do Login */}
       <div className="w-full max-w-sm text-center mt-10">
         <h1 className="text-lg text-gray-300">
           Junte-se <br />ao <br />
@@ -43,56 +20,66 @@ export default function CadastroPage() {
       <div className="w-full max-w-sm p-4">
         <h2 className="text-2xl font-bold text-center mb-6 text-white">Cadastro</h2>
         
-        <form className="flex flex-col gap-5">
+        {state?.message && (
+          <div className="bg-red-900/50 border border-red-500 text-red-200 text-sm p-3 rounded-lg mb-4 text-center animate-in fade-in slide-in-from-top-2">
+            {state.message}
+          </div>
+        )}
+
+        <form action={action} className="flex flex-col gap-5">
           
-          {/* Input Usuário */}
           <div className="flex flex-col gap-2">
-            <label className="text-sm text-gray-400">Nome do Agente</label>
+            <label htmlFor="nomeUsuario" className="text-sm text-gray-400">Nome da conta</label>
             <input 
+              id="nomeUsuario"
+              name="nomeUsuario"
               type="text" 
-              value={usuario}
-              onChange={(e) => setUsuario(e.target.value)}
               className="bg-transparent border border-gray-600 rounded-lg h-12 px-4 outline-none focus:border-harmonia-purple focus:shadow-[0_0_10px_#8A38F5] transition-all text-white placeholder-gray-600"
               placeholder="Digite seu nome..."
             />
+            {state?.errors?.nomeUsuario && (
+              <p className="text-xs text-red-400 font-bold">{state.errors.nomeUsuario[0]}</p>
+            )}
           </div>
 
-          {/* Input Senha */}
           <div className="flex flex-col gap-2">
-            <label className="text-sm text-gray-400">Senha de Acesso</label>
+            <label htmlFor="senha" className="text-sm text-gray-400">Senha de Acesso</label>
             <input 
+              id="senha"
+              name="senha"
               type="password" 
-              value={senha}
-              onChange={(e) => setSenha(e.target.value)}
               className="bg-transparent border border-gray-600 rounded-lg h-12 px-4 outline-none focus:border-harmonia-purple focus:shadow-[0_0_10px_#8A38F5] transition-all text-white placeholder-gray-600"
               placeholder="Crie sua senha..."
             />
+            {state?.errors?.senha && (
+              <p className="text-xs text-red-400 font-bold">{state.errors.senha[0]}</p>
+            )}
           </div>
 
-          {/* Select Tipo de Usuário (Com a opção Jogador) */}
           <div className="flex flex-col gap-2">
-            <label className="text-sm text-gray-400">Tipo de Usuário</label>
+            <label htmlFor="tipoUsuario" className="text-sm text-gray-400">Tipo de Usuário</label>
             <select 
-              value={tipo}
-              onChange={(e) => setTipo(e.target.value)}
+              id="tipoUsuario"
+              name="tipoUsuario"
+              defaultValue="JOGADOR"
               className="bg-transparent border border-gray-600 rounded-lg h-12 px-4 outline-none focus:border-harmonia-purple focus:shadow-[0_0_10px_#8A38F5] transition-all text-white cursor-pointer"
             >
-              {/* Opção atualizada para JOGADOR */}
               <option value="JOGADOR" className="bg-[#1a1a1a] text-white">Jogador</option>
               <option value="MESTRE" className="bg-[#1a1a1a] text-white">Mestre</option>
             </select>
+            {state?.errors?.tipoUsuario && (
+              <p className="text-xs text-red-400 font-bold">{state.errors.tipoUsuario[0]}</p>
+            )}
           </div>
 
-          {/* Botão */}
           <button 
-            type="button"
-            onClick={handleCadastro}
-            className="flex items-center justify-center gap-2 px-4 py-2 rounded-lg font-bold transition-all duration-200 bg-white text-black hover:bg-gray-200 shadow-[0_0_15px_rgba(255,255,255,0.2)] mt-4 w-full h-12 text-base"
+            type="submit"
+            disabled={pending}
+            className="flex items-center justify-center gap-2 px-4 py-2 rounded-lg font-bold transition-all duration-200 bg-white text-black hover:bg-gray-200 shadow-[0_0_15px_rgba(255,255,255,0.2)] mt-4 w-full h-12 text-base disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            Cadastrar
+            {pending ? "Cadastrando..." : "Cadastrar"}
           </button>
 
-          {/* Link para voltar ao Login */}
           <div className="text-center mt-2">
              <span className="text-gray-500 text-sm">Já é um agente? </span>
              <Link href="/login" className="text-harmonia-purple hover:text-white transition-colors text-sm font-bold">

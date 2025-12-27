@@ -3,8 +3,8 @@ import { useState, useEffect } from "react";
 import { Plus } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { CharacterCard } from "./components/CharacterCard";
-import { bancoDePersonagens } from "@/lib/personagens";
-import { formatarDataFirebase } from "@/lib/utils";
+import { formatarDataFirestore } from "@/lib/utils"; 
+import { buscarMeusAgentes } from "./actions"; 
 
 export default function DashboardPage() {
   
@@ -12,15 +12,13 @@ export default function DashboardPage() {
   const [carregando, setCarregando] = useState(true);
 
   useEffect(() => {
-    const idUsuarioLogado = localStorage.getItem("idUsuario");
+    const carregarDados = async () => {
+      const dados = await buscarMeusAgentes();
+      setMeusPersonagens(dados);
+      setCarregando(false);
+    };
 
-    if (idUsuarioLogado) {
-      const fichasFiltradas = bancoDePersonagens.filter(
-        (ficha) => ficha.idUsuario === idUsuarioLogado
-      );
-      setMeusPersonagens(fichasFiltradas);
-    }
-    setCarregando(false);
+    carregarDados();
   }, []);
 
   return (
@@ -45,7 +43,8 @@ export default function DashboardPage() {
               id={char.id}
               nome={char.personagem} 
               campanha={char.nomeCampanha}
-              criadoEm={formatarDataFirebase(char.criadoEm)} 
+              imgPersonagem={char.imgPersonagem} 
+              criadoEm={formatarDataFirestore(char.criadoEm)} 
             />
           ))}
         </section>

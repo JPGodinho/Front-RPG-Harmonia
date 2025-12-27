@@ -9,17 +9,31 @@ interface CharacterCardProps {
   nome: string;
   campanha: string;
   criadoEm: string;
+  imgPersonagem?: string | null;
 }
 
-export function CharacterCard({ id, nome, campanha, criadoEm }: CharacterCardProps) {
+export function CharacterCard({ id, nome, campanha, criadoEm, imgPersonagem }: CharacterCardProps) {
 
   return (
     <div className="bg-[#1a1a1a] border border-gray-800 rounded-2xl p-4 md:p-6 flex flex-col md:flex-row items-center justify-between gap-4 md:gap-6 hover:border-harmonia-purple/50 transition-colors group">
       
       <div className="flex items-center gap-4 md:gap-6 w-full md:w-auto">
         
-        <div className="w-16 h-16 md:w-20 md:h-20 rounded-full bg-white flex items-center justify-center text-black shrink-0 border-2 border-gray-600 group-hover:border-harmonia-purple transition-colors shadow-lg">
-          <User size={32} className="md:w-10 md:h-10" />
+        {/* 2. Container da Foto/Ícone */}
+        <div className="w-16 h-16 md:w-20 md:h-20 rounded-full shrink-0 border-2 border-gray-600 group-hover:border-harmonia-purple transition-colors shadow-lg overflow-hidden relative bg-gray-800">
+          
+          {imgPersonagem ? (
+            <img 
+              src={imgPersonagem} 
+              alt={`Personagem ${nome}`}
+              className="w-full h-full object-cover"
+            />
+          ) : (
+            <div className="w-full h-full bg-white flex items-center justify-center text-black">
+              <User size={32} className="md:w-10 md:h-10" />
+            </div>
+          )}
+          
         </div>
 
         <div className="flex flex-col gap-2 md:gap-3">

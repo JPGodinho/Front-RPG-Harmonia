@@ -1,7 +1,7 @@
 "use client";
 import { useRef, useEffect } from "react";
 import { PericiasList } from "./PericiasList";
-import { Pericia } from "@/lib/pericias";
+import { Pericia } from "@/lib/types";
 
 interface AtributoBotaoProps { 
   label: string; 
