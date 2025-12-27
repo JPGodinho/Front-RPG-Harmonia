@@ -1,7 +1,7 @@
 "use client";
-import { User } from "lucide-react";
 
 interface InfoPersonagemProps {
+  urlPersonagem?: string;
   nome: string;
   idade: string;
   nex: string;
@@ -13,6 +13,7 @@ interface InfoPersonagemProps {
 }
 
 export function InfoPersonagem({
+  urlPersonagem,
   nome,
   idade,
   nex,
@@ -35,7 +36,7 @@ export function InfoPersonagem({
       <div className="flex items-center gap-4 mb-1">
         
         <div className="w-16 h-16 rounded-full bg-gray-800 border-2 border-harmonia-purple flex items-center justify-center shrink-0 shadow-[0_0_15px_rgba(227,0,255,0.3)]">
-          <User className="text-white w-8 h-8" />
+          <img src={urlPersonagem} alt="Personagem" className="w-full h-full object-cover rounded-full" />
         </div>
 
         <div className="flex flex-col flex-1 text-center">

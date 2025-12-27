@@ -56,6 +56,7 @@ export default function FichaPage() {
   return (
     <>
       <InfoPersonagem 
+        urlPersonagem={personagem.urlPersonagem}
         nome={personagem.personagem}
         idade={`${personagem.idade} anos`}
         nex={`${personagem.nivelExposicao}%`}
