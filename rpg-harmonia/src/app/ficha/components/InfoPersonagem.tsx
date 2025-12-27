@@ -68,7 +68,7 @@ export function InfoPersonagem({
 
         <div className="flex flex-col">
            <span className="text-[10px] text-gray-500 uppercase tracking-wider">Origem</span>
-           <span className="text-sm md:text-lg font-bold text-white truncate px-1" title={origem}>
+           <span className="text-sm md:text-lg font-bold text-white px-1" title={origem}>
              {origem}
            </span>
         </div>
