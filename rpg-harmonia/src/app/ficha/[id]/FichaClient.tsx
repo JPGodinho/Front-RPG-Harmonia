@@ -1,15 +1,11 @@
 "use client";
 import { useState, useRef, useEffect } from "react";
-
-// Componentes Visuais
 import { InfoPersonagem } from "../components/InfoPersonagem";
 import { StatusBars } from "../components/StatusBars";
 import { AtributosGrid } from "../components/AtributosGrid";
 import { StatusSecundarios } from "../components/StatusSecundarios";
 import { DescricaoView } from "../components/DescricaoView";
 import { RituaisView } from "../components/RituaisView"; 
-
-// Actions e Tipos
 import { buscarPericiasDaFicha, buscarDescricao } from "./actions";
 import { FichaData, ListaDePericias, Pericia, DescricaoData } from "@/lib/types";
 
@@ -17,41 +13,37 @@ interface FichaClientProps {
   dadosIniciais: FichaData;
 }
 
+interface StatusValue {
+  atual: number;
+  max: number;
+}
+
 type TabTipo = "INVENTARIO" | "DESCRICAO" | "ATRIBUTOS" | "RITUAIS" | "HABILIDADES";
 
 export default function FichaClient({ dadosIniciais }: FichaClientProps) {
-  // --- STATES DE STATUS (PV, PE, SAN) ---
-  const [pv, setPv] = useState({ atual: dadosIniciais.pontosDeVida.atual, max: dadosIniciais.pontosDeVida.total });
-  const [pe, setPe] = useState({ atual: dadosIniciais.pontosDeEsforco.atual, max: dadosIniciais.pontosDeEsforco.total });
-  const [san, setSan] = useState({ atual: dadosIniciais.pontosDeSanidade.atual, max: dadosIniciais.pontosDeSanidade.total });
-  
-  // --- LÓGICA DE ATRIBUTOS ---
+  const [pv, setPv] = useState<StatusValue>({ atual: dadosIniciais.pontosDeVida.atual, max: dadosIniciais.pontosDeVida.total });
+  const [pe, setPe] = useState<StatusValue>({ atual: dadosIniciais.pontosDeEsforco.atual, max: dadosIniciais.pontosDeEsforco.total });
+  const [san, setSan] = useState<StatusValue>({ atual: dadosIniciais.pontosDeSanidade.atual, max: dadosIniciais.pontosDeSanidade.total });
   const [atributoSelecionado, setAtributoSelecionado] = useState<string | null>(null);
   const [todasAsPericias, setTodasAsPericias] = useState<ListaDePericias | null>(null);
   const [periciasAtuais, setPericiasAtuais] = useState<Pericia[]>([]);
   const [carregandoPericias, setCarregandoPericias] = useState(false);
-
-  // --- LÓGICA DE ABAS E DESCRIÇÃO ---
   const [abaAtual, setAbaAtual] = useState<TabTipo>("ATRIBUTOS"); 
   const [dadosDescricao, setDadosDescricao] = useState<DescricaoData | null>(null);
   const [carregandoDescricao, setCarregandoDescricao] = useState(false);
-
-  // Ref para rolagem suave
   const contentRef = useRef<HTMLDivElement>(null);
 
-  // --- EFEITOS ---
-
-  // 1. Carregar PE salvo no LocalStorage (Persistência básica)
   useEffect(() => {
+    const pvSalvo = localStorage.getItem(`pv_${dadosIniciais.id}`);
     const peSalvo = localStorage.getItem(`pe_${dadosIniciais.id}`);
-    if (peSalvo) {
-      setPe(JSON.parse(peSalvo));
-    }
+    const sanSalvo = localStorage.getItem(`san_${dadosIniciais.id}`);
+
+    if (pvSalvo) setPv(JSON.parse(pvSalvo));
+    if (peSalvo) setPe(JSON.parse(peSalvo));
+    if (sanSalvo) setSan(JSON.parse(sanSalvo));
   }, [dadosIniciais.id]);
 
-  // 2. Rolagem suave ao mudar de aba
   useEffect(() => {
-    // Rola para o conteúdo apenas se mudar para abas de texto longo
     if (abaAtual === "DESCRICAO" || abaAtual === "RITUAIS") {
       setTimeout(() => {
         contentRef.current?.scrollIntoView({ 
@@ -61,14 +53,30 @@ export default function FichaClient({ dadosIniciais }: FichaClientProps) {
       }, 100);
     }
   }, [abaAtual]);
+  
+  const handleUpdatePv = (novoValor: StatusValue) => {
+    setPv(novoValor);
+    localStorage.setItem(`pv_${dadosIniciais.id}`, JSON.stringify(novoValor));
+  };
 
-  // --- HANDLERS (Funções de Ação) ---
+  const handleUpdatePe = (novoValor: StatusValue) => {
+    setPe(novoValor);
+    localStorage.setItem(`pe_${dadosIniciais.id}`, JSON.stringify(novoValor));
+  };
 
-  // Troca de Aba e busca de dados sob demanda
+  const handleUpdateSan = (novoValor: StatusValue) => {
+    setSan(novoValor);
+    localStorage.setItem(`san_${dadosIniciais.id}`, JSON.stringify(novoValor));
+  };
+
+  const handleGastarPE = (custo: number) => {
+    const novoAtual = pe.atual - custo;
+    if (novoAtual < 0) return; 
+    handleUpdatePe({ ...pe, atual: novoAtual });
+  };
+
   const handleTrocaAba = async (novaAba: TabTipo) => {
     setAbaAtual(novaAba);
-    
-    // Busca descrição apenas se necessário
     if (novaAba === "DESCRICAO" && !dadosDescricao) {
       setCarregandoDescricao(true);
       const desc = await buscarDescricao(dadosIniciais.id);
@@ -77,7 +85,6 @@ export default function FichaClient({ dadosIniciais }: FichaClientProps) {
     }
   };
 
-  // Clique no Atributo para carregar Perícias
   const handleAtributoClick = async (nomeAtributo: string) => {
     if (atributoSelecionado === nomeAtributo) {
       setAtributoSelecionado(null);
@@ -106,20 +113,6 @@ export default function FichaClient({ dadosIniciais }: FichaClientProps) {
     }
   };
 
-  // Função para gastar PE vindo dos Rituais
-  const handleGastarPE = (custo: number) => {
-    const novoAtual = pe.atual - custo;
-    if (novoAtual < 0) return; 
-
-    const novoEstado = { ...pe, atual: novoAtual };
-    
-    // Atualiza Visualmente
-    setPe(novoEstado);
-    // Salva no LocalStorage
-    localStorage.setItem(`pe_${dadosIniciais.id}`, JSON.stringify(novoEstado));
-  };
-
-  // Componente interno do Botão de Aba
   const TabButton = ({ label, tipo }: { label: string, tipo: TabTipo }) => (
     <button
       onClick={() => handleTrocaAba(tipo)}
@@ -138,7 +131,6 @@ export default function FichaClient({ dadosIniciais }: FichaClientProps) {
     <div className="p-4 md:p-8 pb-20">
       <div className="max-w-4xl mx-auto">
         
-        {/* INFO E STATUS (Sempre Visíveis) */}
         <InfoPersonagem 
           imgPersonagem={dadosIniciais.imgPersonagem || undefined}
           nome={dadosIniciais.personagem}
@@ -153,7 +145,9 @@ export default function FichaClient({ dadosIniciais }: FichaClientProps) {
 
         <StatusBars 
           pv={pv} pe={pe} san={san}
-          setPv={setPv} setPe={setPe} setSan={setSan}
+          setPv={handleUpdatePv} 
+          setPe={handleUpdatePe} 
+          setSan={handleUpdateSan}
         />
 
         <StatusSecundarios 
@@ -165,7 +159,6 @@ export default function FichaClient({ dadosIniciais }: FichaClientProps) {
           resistencias={dadosIniciais.resistencia || "Nenhuma"}
         />
 
-        {/* --- MENU DE NAVEGAÇÃO (ABAS) --- */}
         <div className="flex flex-wrap items-center justify-center gap-4 md:gap-8 border-b border-gray-800 mb-8 mt-6">
            <TabButton label="Inventário" tipo="INVENTARIO" />
            <TabButton label="Descrição" tipo="DESCRICAO" />
@@ -174,7 +167,6 @@ export default function FichaClient({ dadosIniciais }: FichaClientProps) {
            <TabButton label="Habilidades" tipo="HABILIDADES" />
         </div>
 
-        {/* --- ÁREA DE CONTEÚDO DINÂMICO --- */}
         <div ref={contentRef} className="min-h-[300px] scroll-mt-24 transition-all duration-500">
           
           {abaAtual === "ATRIBUTOS" && (
