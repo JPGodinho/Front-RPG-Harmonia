@@ -53,3 +53,10 @@ export interface ListaDePericias {
   // Permite acessar com string dinâmica (ex: dados['agilidade'])
   [key: string]: Pericia[]; 
 }
+
+export interface DescricaoData {
+  aparencia: string;
+  personalidade: string;
+  historico: string;
+  objetivo: string;
+}

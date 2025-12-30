@@ -70,7 +70,6 @@ export function AtributosGrid({ atributos, listaPericiasAtual, selecionado, onTo
 
   return (
     <section className="max-w-3xl mx-auto mb-20">
-      <h3 className="text-gray-400 text-sm mb-4 text-center uppercase tracking-widest">Atributos</h3>
       
       <div className="grid grid-cols-5 gap-2 md:gap-8">
          <AtributoBotao 

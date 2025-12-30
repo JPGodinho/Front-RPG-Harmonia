@@ -1,7 +1,7 @@
 'use server';
 
 import { cookies } from 'next/headers';
-import { ListaDePericias } from '@/lib/types';
+import { DescricaoData, ListaDePericias } from '@/lib/types';
 
 export async function buscarPericiasDaFicha(idFicha: string): Promise<ListaDePericias | null> {
   const cookieStore = await cookies();
@@ -27,6 +27,32 @@ export async function buscarPericiasDaFicha(idFicha: string): Promise<ListaDePer
     return await res.json();
   } catch (error) {
     console.error("Erro de conexão nas perícias:", error);
+    return null;
+  }
+}
+
+
+export async function buscarDescricao(idFicha: string): Promise<DescricaoData | null> {
+  const cookieStore = await cookies();
+  const token = cookieStore.get("auth_token")?.value;
+
+  if (!token) return null;
+
+  try {
+    const res = await fetch(`https://harmonia-rpg.onrender.com/api/v1/ficha/${idFicha}/descricao`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`
+      },
+      next: { revalidate: 60 } 
+    });
+
+    if (!res.ok) return null;
+
+    return await res.json();
+  } catch (error) {
+    console.error("Erro ao buscar descrição:", error);
     return null;
   }
 }

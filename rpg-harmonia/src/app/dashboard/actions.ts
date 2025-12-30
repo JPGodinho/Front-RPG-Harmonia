@@ -1,5 +1,6 @@
 'use server';
 
+import { DescricaoData } from '@/lib/types';
 import { cookies } from 'next/headers';
 
 export async function buscarMeusAgentes() {
