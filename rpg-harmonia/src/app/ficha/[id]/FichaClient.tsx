@@ -1,13 +1,16 @@
 "use client";
-import { useState, useRef, useEffect } from "react"; // 1. Adicione useRef e useEffect
-import { HeaderFicha } from "../components/HeaderFicha";
+import { useState, useRef, useEffect } from "react";
+
+// Componentes Visuais
 import { InfoPersonagem } from "../components/InfoPersonagem";
 import { StatusBars } from "../components/StatusBars";
 import { AtributosGrid } from "../components/AtributosGrid";
 import { StatusSecundarios } from "../components/StatusSecundarios";
-import { DescricaoView } from "../components/DescricaoView"; 
+import { DescricaoView } from "../components/DescricaoView";
+import { RituaisView } from "../components/RituaisView"; 
 
-import { buscarPericiasDaFicha, buscarDescricao } from "./actions"; 
+// Actions e Tipos
+import { buscarPericiasDaFicha, buscarDescricao } from "./actions";
 import { FichaData, ListaDePericias, Pericia, DescricaoData } from "@/lib/types";
 
 interface FichaClientProps {
@@ -17,20 +20,39 @@ interface FichaClientProps {
 type TabTipo = "INVENTARIO" | "DESCRICAO" | "ATRIBUTOS" | "RITUAIS" | "HABILIDADES";
 
 export default function FichaClient({ dadosIniciais }: FichaClientProps) {
+  // --- STATES DE STATUS (PV, PE, SAN) ---
   const [pv, setPv] = useState({ atual: dadosIniciais.pontosDeVida.atual, max: dadosIniciais.pontosDeVida.total });
   const [pe, setPe] = useState({ atual: dadosIniciais.pontosDeEsforco.atual, max: dadosIniciais.pontosDeEsforco.total });
   const [san, setSan] = useState({ atual: dadosIniciais.pontosDeSanidade.atual, max: dadosIniciais.pontosDeSanidade.total });
+  
+  // --- LÓGICA DE ATRIBUTOS ---
   const [atributoSelecionado, setAtributoSelecionado] = useState<string | null>(null);
   const [todasAsPericias, setTodasAsPericias] = useState<ListaDePericias | null>(null);
   const [periciasAtuais, setPericiasAtuais] = useState<Pericia[]>([]);
   const [carregandoPericias, setCarregandoPericias] = useState(false);
+
+  // --- LÓGICA DE ABAS E DESCRIÇÃO ---
   const [abaAtual, setAbaAtual] = useState<TabTipo>("ATRIBUTOS"); 
   const [dadosDescricao, setDadosDescricao] = useState<DescricaoData | null>(null);
   const [carregandoDescricao, setCarregandoDescricao] = useState(false);
+
+  // Ref para rolagem suave
   const contentRef = useRef<HTMLDivElement>(null);
 
+  // --- EFEITOS ---
+
+  // 1. Carregar PE salvo no LocalStorage (Persistência básica)
   useEffect(() => {
-    if (abaAtual === "DESCRICAO") {
+    const peSalvo = localStorage.getItem(`pe_${dadosIniciais.id}`);
+    if (peSalvo) {
+      setPe(JSON.parse(peSalvo));
+    }
+  }, [dadosIniciais.id]);
+
+  // 2. Rolagem suave ao mudar de aba
+  useEffect(() => {
+    // Rola para o conteúdo apenas se mudar para abas de texto longo
+    if (abaAtual === "DESCRICAO" || abaAtual === "RITUAIS") {
       setTimeout(() => {
         contentRef.current?.scrollIntoView({ 
           behavior: "smooth",
@@ -40,9 +62,13 @@ export default function FichaClient({ dadosIniciais }: FichaClientProps) {
     }
   }, [abaAtual]);
 
+  // --- HANDLERS (Funções de Ação) ---
+
+  // Troca de Aba e busca de dados sob demanda
   const handleTrocaAba = async (novaAba: TabTipo) => {
     setAbaAtual(novaAba);
-
+    
+    // Busca descrição apenas se necessário
     if (novaAba === "DESCRICAO" && !dadosDescricao) {
       setCarregandoDescricao(true);
       const desc = await buscarDescricao(dadosIniciais.id);
@@ -51,6 +77,7 @@ export default function FichaClient({ dadosIniciais }: FichaClientProps) {
     }
   };
 
+  // Clique no Atributo para carregar Perícias
   const handleAtributoClick = async (nomeAtributo: string) => {
     if (atributoSelecionado === nomeAtributo) {
       setAtributoSelecionado(null);
@@ -79,6 +106,20 @@ export default function FichaClient({ dadosIniciais }: FichaClientProps) {
     }
   };
 
+  // Função para gastar PE vindo dos Rituais
+  const handleGastarPE = (custo: number) => {
+    const novoAtual = pe.atual - custo;
+    if (novoAtual < 0) return; 
+
+    const novoEstado = { ...pe, atual: novoAtual };
+    
+    // Atualiza Visualmente
+    setPe(novoEstado);
+    // Salva no LocalStorage
+    localStorage.setItem(`pe_${dadosIniciais.id}`, JSON.stringify(novoEstado));
+  };
+
+  // Componente interno do Botão de Aba
   const TabButton = ({ label, tipo }: { label: string, tipo: TabTipo }) => (
     <button
       onClick={() => handleTrocaAba(tipo)}
@@ -94,9 +135,10 @@ export default function FichaClient({ dadosIniciais }: FichaClientProps) {
   );
 
   return (
-    <div className="min-h-screen p-4 md:p-8 pb-20">
+    <div className="p-4 md:p-8 pb-20">
       <div className="max-w-4xl mx-auto">
         
+        {/* INFO E STATUS (Sempre Visíveis) */}
         <InfoPersonagem 
           imgPersonagem={dadosIniciais.imgPersonagem || undefined}
           nome={dadosIniciais.personagem}
@@ -123,6 +165,7 @@ export default function FichaClient({ dadosIniciais }: FichaClientProps) {
           resistencias={dadosIniciais.resistencia || "Nenhuma"}
         />
 
+        {/* --- MENU DE NAVEGAÇÃO (ABAS) --- */}
         <div className="flex flex-wrap items-center justify-center gap-4 md:gap-8 border-b border-gray-800 mb-8 mt-6">
            <TabButton label="Inventário" tipo="INVENTARIO" />
            <TabButton label="Descrição" tipo="DESCRICAO" />
@@ -131,6 +174,7 @@ export default function FichaClient({ dadosIniciais }: FichaClientProps) {
            <TabButton label="Habilidades" tipo="HABILIDADES" />
         </div>
 
+        {/* --- ÁREA DE CONTEÚDO DINÂMICO --- */}
         <div ref={contentRef} className="min-h-[300px] scroll-mt-24 transition-all duration-500">
           
           {abaAtual === "ATRIBUTOS" && (
@@ -155,7 +199,15 @@ export default function FichaClient({ dadosIniciais }: FichaClientProps) {
             />
           )}
 
-          {(abaAtual === "INVENTARIO" || abaAtual === "RITUAIS" || abaAtual === "HABILIDADES") && (
+          {abaAtual === "RITUAIS" && (
+             <RituaisView 
+               idFicha={dadosIniciais.id} 
+               peAtual={pe.atual} 
+               onGastarPE={handleGastarPE}
+             />
+          )}
+
+          {(abaAtual === "INVENTARIO" || abaAtual === "HABILIDADES") && (
              <div className="text-center py-20 text-gray-600 italic border border-dashed border-gray-800 rounded-xl">
                Funcionalidade em desenvolvimento...
              </div>

@@ -60,3 +60,24 @@ export interface DescricaoData {
   historico: string;
   objetivo: string;
 }
+
+export interface CustoRitual {
+  normal: number;
+  discente: number;
+  verdadeiro: number;
+}
+
+export interface RitualData {
+  nomeRitual: string;
+  tipoElemento: "MORTE" | "SANGUE" | "ENERGIA" | "CONHECIMENTO" | "MEDO";
+  custoRitual: CustoRitual;
+  execucao: string;
+  alcance: string;
+  alvo: string;
+  duracao: string;
+  resistencia: string;
+  descricao: string;
+  dtRitual: number;
+  danoSanidade: number | null;
+  circulo: number;
+}
