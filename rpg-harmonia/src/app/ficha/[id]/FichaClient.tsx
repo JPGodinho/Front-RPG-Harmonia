@@ -119,7 +119,7 @@ export default function FichaClient({ dadosIniciais }: FichaClientProps) {
       className={`
         uppercase text-xs md:text-sm font-bold tracking-widest pb-2 px-2 transition-all
         ${abaAtual === tipo 
-          ? "text-white border-b-2 border-harmonia-purple shadow-[0_4px_10px_-4px_#E300FF]" 
+          ? "text-white border-b-2 border-harmonia-purple shadow-[0_8px_11px_-6px_#E300FF]" 
           : "text-gray-500 hover:text-gray-300 hover:border-b-2 hover:border-gray-700"}
       `}
     >
@@ -128,7 +128,7 @@ export default function FichaClient({ dadosIniciais }: FichaClientProps) {
   );
 
   return (
-    <div className="p-4 md:p-8 pb-20">
+    <div className="md:p-8 pb-20">
       <div className="max-w-4xl mx-auto">
         
         <InfoPersonagem 

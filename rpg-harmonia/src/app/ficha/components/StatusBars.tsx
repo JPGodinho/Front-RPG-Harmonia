@@ -30,7 +30,7 @@ export function StatusBars({ pv, pe, san, setPv, setPe, setSan }: StatusBarsProp
   return (
     <section className="grid grid-cols-2 gap-3 mb-5">
       
-      <div className="col-span-2 mx-6 bg-[#1a1a1a] border border-red-900/30 rounded-xl p-2 relative overflow-hidden shadow-lg group">
+      <div className="col-span-2 bg-[#1a1a1a] border border-red-900/30 rounded-xl p-2 relative overflow-hidden shadow-lg group">
         <div 
           className="absolute bottom-0 left-0 h-1 bg-red-600 transition-all duration-500" 
           style={{ width: `${(pv.atual / (pv.max || 1)) * 100}%` }} 

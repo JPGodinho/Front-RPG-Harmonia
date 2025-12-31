@@ -13,7 +13,7 @@ function InfoDisplay({ label, children, className = "" }: { label: string, child
   return (
     <div className={`bg-[#1a1a1a] border border-gray-800 p-3 flex flex-col items-center justify-center text-center shadow-md h-full ${className}`}>
       <span className="text-[10px] text-gray-500 uppercase tracking-widest font-bold mb-1">{label}</span>
-      <div className="text-white font-bold w-full flex items-center justify-center text-lg md:text-xl leading-tight">
+      <div className="text-white font-bold w-full flex items-center justify-center text-sm md:text-xl leading-tight">
         {children}
       </div>
     </div>
@@ -48,7 +48,7 @@ export function StatusSecundarios({
         </div>
 
         <div className="col-span-2">
-            <InfoDisplay label="RD Bloqueio">
+            <InfoDisplay label="Redução de dano Bloqueando">
                 {rdBloqueio}
             </InfoDisplay>
         </div>

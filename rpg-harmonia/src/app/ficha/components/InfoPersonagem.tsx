@@ -42,7 +42,7 @@ export function InfoPersonagem({
         <div className="flex flex-col flex-1 text-center">
            <div>
               <span className="text-[10px] text-gray-500 uppercase tracking-wider font-bold">Personagem</span>
-              <h1 className="text-base md:text-lg font-bold text-white leading-tight wrap-break-word text-center">
+              <h1 className="text-sm md:text-lg font-bold text-white leading-tight wrap-break-word text-center">
                 {nome}
               </h1>
            </div>
@@ -50,7 +50,7 @@ export function InfoPersonagem({
 
         <div className="flex flex-col items-center border-l border-gray-700 pl-6 shrink-0">
             <span className="text-[10px] text-gray-500 uppercase tracking-wider font-bold">Idade</span>
-            <span className="text-xl font-bold text-white text-center">{idade}</span>
+            <span className="text-sm font-bold text-white text-center">{idade}</span>
         </div>
       </div>
 
@@ -58,12 +58,12 @@ export function InfoPersonagem({
         
         <div className="flex flex-col">
            <span className="text-[10px] text-gray-500 uppercase tracking-wider">NEX</span>
-           <span className="text-lg font-bold text-white text-center">{nex}</span>
+           <span className="text-sm font-bold text-white text-center">{nex}</span>
         </div>
 
         <div className="flex flex-col border-x border-gray-800">
            <span className="text-[10px] text-gray-500 uppercase tracking-wider">PE/Rodada</span>
-           <span className="text-lg font-bold text-yellow-400">{peRodada}</span>
+           <span className="text-sm font-bold text-yellow-400">{peRodada}</span>
         </div>
 
         <div className="flex flex-col">

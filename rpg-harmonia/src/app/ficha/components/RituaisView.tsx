@@ -132,8 +132,8 @@ function RitualCard({ ritual, onUsar }: { ritual: RitualData; onUsar: () => void
              <LinhaDetalhe label="Resistência" valor={ritual.resistencia} />
              
              <div className="flex gap-6 mt-2">
-                <LinhaDetalhe label="DT Ritual" valor={ritual.dtRitual} destaque />
                 <LinhaDetalhe label="Círculo" valor={`${ritual.circulo}º`} />
+                <LinhaDetalhe label="DT Ritual" valor={ritual.dtRitual} destaque />
              </div>
              
              {ritual.danoSanidade && (
