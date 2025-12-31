@@ -3,7 +3,7 @@ import { Menu, LogOut, ChevronLeft } from "lucide-react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import router from "next/dist/shared/lib/router/router";
-import { logout } from "@/actions/auth";
+import { logout } from "@/app/actions/auth";
 
 export function HeaderBackButton() {
   const router = useRouter();

@@ -58,6 +58,12 @@ export async function login(prevState: FormState, formData: FormData) {
         maxAge: 60 * 60 * 24,
         path: '/'
     });
+    
+    // Salva o tipoUsuario também para buscar fichas
+    cookieStore.set('user_type', data.tipoUsuario, {
+        maxAge: 60 * 60 * 24,
+        path: '/'
+    });
 
   } catch (error) {
     console.error("Erro no login:", error);
