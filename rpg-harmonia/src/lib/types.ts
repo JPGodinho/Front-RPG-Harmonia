@@ -36,6 +36,15 @@ export interface FichaData {
   deslocamento: string;
 }
 
+export interface FichaUsuario {
+  id: string;
+  imgPersonagem?: string | null;
+  personagem: string;
+  nomeCampanha: string;
+  criadoEm: { seconds: number; nanos: number };
+}
+
+
 export interface Pericia {
   nome: string;
   treino: number;

@@ -1,7 +1,7 @@
 "use client";
 import { useActionState } from "react";
 import Link from "next/link";
-import { login } from "@/actions/auth"; // Importa nossa função do servidor
+import { login } from "@/app/actions/auth"; // Importa nossa função do servidor
 
 export default function LoginPage() {
   // Conecta o formulário à Server Action

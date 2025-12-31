@@ -5,10 +5,11 @@ import { Button } from "@/components/ui/Button";
 import { CharacterCard } from "./components/CharacterCard";
 import { formatarDataFirestore } from "@/lib/utils"; 
 import { buscarMeusAgentes } from "./actions"; 
+import { FichaUsuario } from "@/lib/types";
 
 export default function DashboardPage() {
   
-  const [meusPersonagens, setMeusPersonagens] = useState<any[]>([]);
+  const [meusPersonagens, setMeusPersonagens] = useState<FichaUsuario[]>([]);
   const [carregando, setCarregando] = useState(true);
 
   useEffect(() => {

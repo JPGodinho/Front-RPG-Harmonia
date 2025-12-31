@@ -1,7 +1,7 @@
 "use client"; 
 import { useActionState } from "react";
 import Link from "next/link";
-import { signup } from "@/actions/auth";
+import { signup } from "@/app/actions/auth";
 
 export default function CadastroPage() {
   const [state, action, pending] = useActionState(signup, undefined);
