@@ -1,11 +1,13 @@
 "use client";
-import { useActionState } from "react";
+import { useActionState, useState } from "react";
 import Link from "next/link";
 import { login } from "@/app/actions/auth"; // Importa nossa função do servidor
+import { Eye, EyeClosed } from "lucide-react";
 
 export default function LoginPage() {
   // Conecta o formulário à Server Action
   const [state, action, pending] = useActionState(login, undefined);
+  const [verSenha, setVerSenha] = useState(false);
 
   return (
     <main className="min-h-screen bg-harmonia-bg text-white flex flex-col items-center gap-10 p-4">
@@ -49,19 +51,40 @@ export default function LoginPage() {
 
           {/* Senha */}
           <div className="flex flex-col gap-2">
-            <label htmlFor="senha" className="text-sm text-gray-400">Senha</label>
-            <input 
-              id="senha"
-              name="senha"
-              type="password" 
-              className="bg-transparent border border-gray-600 rounded-lg h-12 px-4 outline-none focus:border-harmonia-purple focus:shadow-[0_0_10px_#8A38F5] transition-all text-white placeholder-gray-600"
-              placeholder="Digite sua senha..."
-            />
+            <label htmlFor="senha" className="text-sm text-gray-400">
+              Senha
+            </label>
+
+            {/* Wrapper relative */}
+            <div className="relative">
+              <input
+                id="senha"
+                name="senha"
+                type={verSenha ? "text" : "password"}
+                className="bg-transparent border border-gray-600 rounded-lg w-full h-12 px-4 pr-12 outline-none
+                          focus:border-harmonia-purple focus:shadow-[0_0_10px_#8A38F5]
+                          transition-all text-white placeholder-gray-600"
+                placeholder="Digite sua senha..."
+              />
+
+              {/* Ícone */}
+              <button
+                type="button"
+                onClick={() => setVerSenha(!verSenha)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white transition"
+              >
+                {verSenha ? <Eye /> : <EyeClosed />}
+              </button>
+            </div>
+
             {/* Erro de Validação (Zod) */}
             {state?.errors?.senha && (
-              <p className="text-xs text-red-400 font-bold">{state.errors.senha[0]}</p>
+              <p className="text-xs text-red-400 font-bold">
+                {state.errors.senha[0]}
+              </p>
             )}
           </div>
+
 
           <button 
             type="submit"
