@@ -90,3 +90,8 @@ export interface RitualData {
   danoSanidade: number | null;
   circulo: number;
 }
+
+export interface HabilidadeData {
+  nome: string;
+  descricao: string;
+}
