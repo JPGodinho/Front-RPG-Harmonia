@@ -1,15 +1,21 @@
 "use client";
 import { useState, useRef, useEffect } from "react";
+import { doc, onSnapshot } from "firebase/firestore"; 
+import { db } from "@/lib/firebase"; 
+
+// Componentes Visuais
 import { InfoPersonagem } from "../components/InfoPersonagem";
 import { StatusBars } from "../components/StatusBars";
 import { AtributosGrid } from "../components/AtributosGrid";
 import { StatusSecundarios } from "../components/StatusSecundarios";
 import { DescricaoView } from "../components/DescricaoView";
 import { RituaisView } from "../components/RituaisView"; 
-import { buscarPericiasDaFicha, buscarDescricao } from "./actions";
-import { FichaData, ListaDePericias, Pericia, DescricaoData } from "@/lib/types";
-import { HabilidadesView } from "../components/HabilidadesView";
+import { HabilidadesView } from "../components/HabilidadesView"; 
 import { InventarioView } from "../components/InventarioView";
+
+// Actions e Tipos
+import { buscarPericiasDaFicha, buscarDescricao, atualizarFicha } from "./actions"; 
+import { FichaData, ListaDePericias, Pericia, DescricaoData } from "@/lib/types";
 
 interface FichaClientProps {
   dadosIniciais: FichaData;
@@ -17,15 +23,18 @@ interface FichaClientProps {
 
 interface StatusValue {
   atual: number;
-  max: number;
+  total: number;
 }
 
 type TabTipo = "INVENTARIO" | "DESCRICAO" | "ATRIBUTOS" | "RITUAIS" | "HABILIDADES";
 
 export default function FichaClient({ dadosIniciais }: FichaClientProps) {
-  const [pv, setPv] = useState<StatusValue>({ atual: dadosIniciais.pontosDeVida.atual, max: dadosIniciais.pontosDeVida.total });
-  const [pe, setPe] = useState<StatusValue>({ atual: dadosIniciais.pontosDeEsforco.atual, max: dadosIniciais.pontosDeEsforco.total });
-  const [san, setSan] = useState<StatusValue>({ atual: dadosIniciais.pontosDeSanidade.atual, max: dadosIniciais.pontosDeSanidade.total });
+  // --- STATES ---
+  const [pv, setPv] = useState<StatusValue>(dadosIniciais.pontosDeVida);
+  const [pe, setPe] = useState<StatusValue>(dadosIniciais.pontosDeEsforco);
+  const [san, setSan] = useState<StatusValue>(dadosIniciais.pontosDeSanidade);
+  
+  // --- OUTROS STATES ---
   const [atributoSelecionado, setAtributoSelecionado] = useState<string | null>(null);
   const [todasAsPericias, setTodasAsPericias] = useState<ListaDePericias | null>(null);
   const [periciasAtuais, setPericiasAtuais] = useState<Pericia[]>([]);
@@ -33,42 +42,46 @@ export default function FichaClient({ dadosIniciais }: FichaClientProps) {
   const [abaAtual, setAbaAtual] = useState<TabTipo>("ATRIBUTOS"); 
   const [dadosDescricao, setDadosDescricao] = useState<DescricaoData | null>(null);
   const [carregandoDescricao, setCarregandoDescricao] = useState(false);
+
   const contentRef = useRef<HTMLDivElement>(null);
 
+  // --- 1. LEITURA (REALTIME) ---
   useEffect(() => {
-    const pvSalvo = localStorage.getItem(`pv_${dadosIniciais.id}`);
-    const peSalvo = localStorage.getItem(`pe_${dadosIniciais.id}`);
-    const sanSalvo = localStorage.getItem(`san_${dadosIniciais.id}`);
+    if (!dadosIniciais.id) return;
+    const fichaRef = doc(db, "fichas", dadosIniciais.id);
 
-    if (pvSalvo) setPv(JSON.parse(pvSalvo));
-    if (peSalvo) setPe(JSON.parse(peSalvo));
-    if (sanSalvo) setSan(JSON.parse(sanSalvo));
+    const unsubscribe = onSnapshot(fichaRef, (docSnap) => {
+      if (docSnap.exists()) {
+        const data = docSnap.data();
+        if (data.pontosDeVida) setPv(data.pontosDeVida);
+        if (data.pontosDeEsforco) setPe(data.pontosDeEsforco);
+        if (data.pontosDeSanidade) setSan(data.pontosDeSanidade);
+      }
+    });
+
+    return () => unsubscribe();
   }, [dadosIniciais.id]);
 
-  useEffect(() => {
-    if (abaAtual === "DESCRICAO" || abaAtual === "RITUAIS") {
-      setTimeout(() => {
-        contentRef.current?.scrollIntoView({ 
-          behavior: "smooth",
-          block: "start"
-        });
-      }, 100);
-    }
-  }, [abaAtual]);
+
+  // --- 2. ESCRITA (API + COOKIES) ---
   
-  const handleUpdatePv = (novoValor: StatusValue) => {
-    setPv(novoValor);
-    localStorage.setItem(`pv_${dadosIniciais.id}`, JSON.stringify(novoValor));
+  const handleUpdatePv = async (novoValor: StatusValue) => {
+    // Apenas passamos o ID da ficha e o payload. O idUsuario agora é pego no server.
+    await atualizarFicha(dadosIniciais.id, {
+      pontosDeVida: novoValor 
+    });
   };
 
-  const handleUpdatePe = (novoValor: StatusValue) => {
-    setPe(novoValor);
-    localStorage.setItem(`pe_${dadosIniciais.id}`, JSON.stringify(novoValor));
+  const handleUpdatePe = async (novoValor: StatusValue) => {
+    await atualizarFicha(dadosIniciais.id, {
+      pontosDeEsforco: novoValor
+    });
   };
 
-  const handleUpdateSan = (novoValor: StatusValue) => {
-    setSan(novoValor);
-    localStorage.setItem(`san_${dadosIniciais.id}`, JSON.stringify(novoValor));
+  const handleUpdateSan = async (novoValor: StatusValue) => {
+    await atualizarFicha(dadosIniciais.id, {
+      pontosDeSanidade: novoValor
+    });
   };
 
   const handleGastarPE = (custo: number) => {
@@ -76,6 +89,18 @@ export default function FichaClient({ dadosIniciais }: FichaClientProps) {
     if (novoAtual < 0) return; 
     handleUpdatePe({ ...pe, atual: novoAtual });
   };
+
+
+  // --- RESTO DO CÓDIGO (HANDLERS E RENDERIZAÇÃO) ---
+  // (Mantém exatamente igual, sem alterações)
+
+  useEffect(() => {
+    if (abaAtual === "DESCRICAO" || abaAtual === "RITUAIS") {
+      setTimeout(() => {
+        contentRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+      }, 100);
+    }
+  }, [abaAtual]);
 
   const handleTrocaAba = async (novaAba: TabTipo) => {
     setAbaAtual(novaAba);
@@ -98,18 +123,13 @@ export default function FichaClient({ dadosIniciais }: FichaClientProps) {
     setPericiasAtuais([]);
 
     const atributoChave = nomeAtributo.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, ""); 
-
     try {
       let dadosGerais = todasAsPericias;
       if (!dadosGerais) {
         dadosGerais = await buscarPericiasDaFicha(dadosIniciais.id);
         setTodasAsPericias(dadosGerais);
       }
-      if (dadosGerais && dadosGerais[atributoChave]) {
-        setPericiasAtuais(dadosGerais[atributoChave]);
-      }
-    } catch (error) {
-      console.error("Erro ao carregar perícias");
+      if (dadosGerais && dadosGerais[atributoChave]) setPericiasAtuais(dadosGerais[atributoChave]);
     } finally {
       setCarregandoPericias(false);
     }
@@ -121,7 +141,7 @@ export default function FichaClient({ dadosIniciais }: FichaClientProps) {
       className={`
         uppercase text-xs md:text-sm font-bold tracking-widest pb-2 px-2 transition-all
         ${abaAtual === tipo 
-          ? "text-white border-b-2 border-harmonia-purple shadow-[0_8px_11px_-6px_#E300FF]" 
+          ? "text-white border-b-2 border-harmonia-purple shadow-[0_4px_10px_-4px_#E300FF]" 
           : "text-gray-500 hover:text-gray-300 hover:border-b-2 hover:border-gray-700"}
       `}
     >
@@ -130,7 +150,7 @@ export default function FichaClient({ dadosIniciais }: FichaClientProps) {
   );
 
   return (
-    <div className="md:p-8 pb-20">
+    <div className="p-4 md:p-8 pb-20">
       <div className="max-w-4xl mx-auto">
         
         <InfoPersonagem 
@@ -187,26 +207,19 @@ export default function FichaClient({ dadosIniciais }: FichaClientProps) {
           )}
 
           {abaAtual === "DESCRICAO" && (
-            <DescricaoView 
-              dados={dadosDescricao} 
-              carregando={carregandoDescricao} 
-            />
+            <DescricaoView dados={dadosDescricao} carregando={carregandoDescricao} />
           )}
 
           {abaAtual === "RITUAIS" && (
-             <RituaisView 
-               idFicha={dadosIniciais.id} 
-               peAtual={pe.atual} 
-               onGastarPE={handleGastarPE}
-             />
+             <RituaisView idFicha={dadosIniciais.id} peAtual={pe.atual} onGastarPE={handleGastarPE} />
           )}
-
+          
           {abaAtual === "HABILIDADES" && (
              <HabilidadesView idFicha={dadosIniciais.id} />
           )}
 
           {abaAtual === "INVENTARIO" && (
-            <InventarioView idFicha={dadosIniciais.id} />
+             <InventarioView idFicha={dadosIniciais.id} />
           )}
 
         </div>

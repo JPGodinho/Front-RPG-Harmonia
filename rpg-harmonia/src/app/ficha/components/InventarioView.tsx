@@ -165,12 +165,12 @@ function ItemCard({ item }: { item: ItemData }) {
             <div className="flex gap-2 mt-0.5">
               {item.categoria !== "0" && (
                 <span className="text-[9px] bg-yellow-900/40 text-yellow-500 border border-yellow-700/50 px-1.5 rounded uppercase font-bold tracking-wider">
-                  Cat {item.categoria}
+                  Categoria {item.categoria}
                 </span>
               )}
               {item.espacos > 0 && (
                 <span className="text-[9px] bg-gray-800 text-gray-400 border border-gray-700 px-1.5 rounded uppercase font-bold tracking-wider">
-                  {item.espacos} {item.espacos === 1 ? 'Esp' : 'Esp'}
+                  {item.espacos} {item.espacos === 1 ? 'Espaço' : 'Espaço'}
                 </span>
               )}
             </div>

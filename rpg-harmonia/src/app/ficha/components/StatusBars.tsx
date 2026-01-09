@@ -1,9 +1,10 @@
 "use client";
 import { Plus, Minus } from "lucide-react";
 
+// CORREÇÃO: Mudamos 'max' para 'total' para bater com o banco de dados
 interface StatusValue {
   atual: number;
-  max: number;
+  total: number;
 }
 
 interface StatusBarsProps {
@@ -24,16 +25,19 @@ export function StatusBars({ pv, pe, san, setPv, setPe, setSan }: StatusBarsProp
   ) => {
     const novoAtual = current.atual + change;
     if (novoAtual < 0) return;
+    // Aqui mantemos o 'total' inalterado
     setter({ ...current, atual: novoAtual });
   };
 
   return (
     <section className="grid grid-cols-2 gap-3 mb-5">
       
+      {/* BARRA DE VIDA (PV) */}
       <div className="col-span-2 bg-[#1a1a1a] border border-red-900/30 rounded-xl p-2 relative overflow-hidden shadow-lg group">
         <div 
           className="absolute bottom-0 left-0 h-1 bg-red-600 transition-all duration-500" 
-          style={{ width: `${(pv.atual / (pv.max || 1)) * 100}%` }} 
+          // CORREÇÃO: Usando pv.total
+          style={{ width: `${(pv.atual / (pv.total || 1)) * 100}%` }} 
         />
         
         <div className="flex flex-col items-center gap-1 z-10 relative">
@@ -48,7 +52,8 @@ export function StatusBars({ pv, pe, san, setPv, setPe, setSan }: StatusBarsProp
               </button>
 
               <div className="text-xl font-bold text-white tabular-nums tracking-wider">
-                {pv.atual}<span className="text-gray-600 text-sm">/{pv.max}</span>
+                {/* CORREÇÃO: Usando pv.total */}
+                {pv.atual}<span className="text-gray-600 text-sm">/{pv.total}</span>
               </div>
 
               <button 
@@ -61,10 +66,11 @@ export function StatusBars({ pv, pe, san, setPv, setPe, setSan }: StatusBarsProp
         </div>
       </div>
 
+      {/* BARRA DE ESFORÇO (PE) */}
       <div className="bg-[#1a1a1a] border border-yellow-900/30 rounded-xl p-2 relative overflow-hidden shadow-lg">
         <div 
           className="absolute bottom-0 left-0 h-1 bg-yellow-500 transition-all duration-500" 
-          style={{ width: `${(pe.atual / (pe.max || 1)) * 100}%` }} 
+          style={{ width: `${(pe.atual / (pe.total || 1)) * 100}%` }} 
         />
         
         <div className="flex flex-col items-center gap-1 z-10 relative">
@@ -79,7 +85,7 @@ export function StatusBars({ pv, pe, san, setPv, setPe, setSan }: StatusBarsProp
               </button>
 
               <div className="text-lg font-bold text-white tabular-nums">
-                {pe.atual}<span className="text-gray-600 text-xs">/{pe.max}</span>
+                {pe.atual}<span className="text-gray-600 text-xs">/{pe.total}</span>
               </div>
 
               <button 
@@ -92,10 +98,11 @@ export function StatusBars({ pv, pe, san, setPv, setPe, setSan }: StatusBarsProp
         </div>
       </div>
 
+      {/* BARRA DE SANIDADE (SAN) */}
       <div className="bg-[#1a1a1a] border border-blue-900/30 rounded-xl p-2 relative overflow-hidden shadow-lg">
         <div 
           className="absolute bottom-0 left-0 h-1 bg-blue-500 transition-all duration-500" 
-          style={{ width: `${(san.atual / (san.max || 1)) * 100}%` }} 
+          style={{ width: `${(san.atual / (san.total || 1)) * 100}%` }} 
         />
         
         <div className="flex flex-col items-center gap-1 z-10 relative">
@@ -110,7 +117,7 @@ export function StatusBars({ pv, pe, san, setPv, setPe, setSan }: StatusBarsProp
               </button>
 
               <div className="text-lg font-bold text-white tabular-nums">
-                {san.atual}<span className="text-gray-600 text-xs">/{san.max}</span>
+                {san.atual}<span className="text-gray-600 text-xs">/{san.total}</span>
               </div>
 
               <button 

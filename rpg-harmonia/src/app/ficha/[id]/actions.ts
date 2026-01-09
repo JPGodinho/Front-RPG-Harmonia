@@ -131,3 +131,40 @@ export async function buscarInventario(idFicha: string): Promise<InventarioData 
     return null;
   }
 }
+
+export async function atualizarFicha(idFicha: string, payload: any) {
+  const cookieStore = await cookies();
+  const token = cookieStore.get("auth_token")?.value;
+  const idUsuario = cookieStore.get("user_id")?.value; // <--- LENDO DO COOKIE
+
+  if (!token) {
+    console.error("Sem token de autenticação");
+    return false;
+  }
+
+  if (!idUsuario) {
+    console.error("ID do usuário não encontrado nos cookies");
+    return false;
+  }
+
+  try {
+    const res = await fetch(`https://harmonia-rpg.onrender.com/api/v1/ficha/${idFicha}?id-usuario=${idUsuario}`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`
+      },
+      body: JSON.stringify(payload)
+    });
+
+    if (!res.ok) {
+      console.error("Erro na API de atualização:", res.status);
+      return false;
+    }
+
+    return true;
+  } catch (error) {
+    console.error("Erro de conexão:", error);
+    return false;
+  }
+}
