@@ -95,3 +95,31 @@ export interface HabilidadeData {
   nome: string;
   descricao: string;
 }
+
+export interface ItemData {
+  nomeItem: string;
+  categoria: string;
+  espacos: number;
+  descricao: string;
+}
+
+export interface LimitesCategoria {
+  categoriaI: number;
+  categoriaII: number;
+  categoriaIII: number;
+  categoriaIV: number;
+  categoriaV: number;
+  categoriaVI: number;
+}
+
+export interface InventarioData {
+  carga: {
+    atual: number;
+    total: number;
+  };
+  pontosDePrestigio: number;
+  patente: string;
+  limiteCreditos: string;
+  limiteItens: LimitesCategoria;
+  itens: ItemData[];
+}

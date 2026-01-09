@@ -9,6 +9,7 @@ import { RituaisView } from "../components/RituaisView";
 import { buscarPericiasDaFicha, buscarDescricao } from "./actions";
 import { FichaData, ListaDePericias, Pericia, DescricaoData } from "@/lib/types";
 import { HabilidadesView } from "../components/HabilidadesView";
+import { InventarioView } from "../components/InventarioView";
 
 interface FichaClientProps {
   dadosIniciais: FichaData;
@@ -204,14 +205,11 @@ export default function FichaClient({ dadosIniciais }: FichaClientProps) {
              <HabilidadesView idFicha={dadosIniciais.id} />
           )}
 
-          {(abaAtual === "INVENTARIO") && (
-             <div className="text-center py-20 text-gray-600 italic border border-dashed border-gray-800 rounded-xl">
-               Funcionalidade em desenvolvimento...
-             </div>
+          {abaAtual === "INVENTARIO" && (
+            <InventarioView idFicha={dadosIniciais.id} />
           )}
 
         </div>
-
       </div>
     </div>
   );
