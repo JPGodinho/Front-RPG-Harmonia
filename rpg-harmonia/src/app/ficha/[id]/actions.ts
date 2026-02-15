@@ -1,7 +1,7 @@
 'use server';
 
 import { cookies } from 'next/headers';
-import { DescricaoData, HabilidadeData, InventarioData, ListaDePericias, RitualData } from '@/lib/types';
+import { AtaqueData, DescricaoData, HabilidadeData, InventarioData, ListaDePericias, RitualData } from '@/lib/types';
 
 export async function buscarPericiasDaFicha(idFicha: string): Promise<ListaDePericias | null> {
   const cookieStore = await cookies();
@@ -258,5 +258,30 @@ export async function deletarItemDoInventario(idFicha: string, nomeItem: string)
   } catch (error) {
     console.error("Erro de conexão:", error);
     return false;
+  }
+}
+
+export async function buscarAtaques(idFicha: string): Promise<AtaqueData[] | null> {
+  const cookieStore = await cookies();
+  const token = cookieStore.get("auth_token")?.value;
+
+  if (!token) return null;
+
+  try {
+    const res = await fetch(`https://harmonia-rpg.onrender.com/api/v1/ficha/${idFicha}/ataques`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`
+      },
+      next: { revalidate: 60 } 
+    });
+
+    if (!res.ok) return null;
+
+    return await res.json();
+  } catch (error) {
+    console.error("Erro ao buscar ataques:", error);
+    return null;
   }
 }

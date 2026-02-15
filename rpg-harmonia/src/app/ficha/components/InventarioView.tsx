@@ -1,8 +1,8 @@
 "use client";
 import { useState, useEffect } from "react";
-import { InventarioData, ItemData } from "@/lib/types";
-import { buscarInventario, adicionarItemAoInventario, atualizarItemNoInventario, deletarItemDoInventario } from "../[id]/actions"; 
-import { Package, Medal, CreditCard, Briefcase, Plus, X, Loader2, Pencil, Trash2 } from "lucide-react";
+import { InventarioData, ItemData, AtaqueData } from "@/lib/types";
+import { buscarInventario, buscarAtaques, adicionarItemAoInventario, atualizarItemNoInventario, deletarItemDoInventario } from "../[id]/actions"; 
+import { Package, Medal, CreditCard, Briefcase, Plus, X, Loader2, Pencil, Trash2, Sword } from "lucide-react";
 
 interface InventarioViewProps {
   idFicha: string;
@@ -10,16 +10,23 @@ interface InventarioViewProps {
 
 export function InventarioView({ idFicha }: InventarioViewProps) {
   const [inventario, setInventario] = useState<InventarioData | null>(null);
+  const [ataques, setAtaques] = useState<AtaqueData[]>([]);
   const [loading, setLoading] = useState(true);
   
-  // Controle do Modal
   const [modalAberto, setModalAberto] = useState(false);
   const [itemParaEditar, setItemParaEditar] = useState<ItemData | null>(null);
 
   async function carregar() {
     if (!inventario) setLoading(true);
-    const dados = await buscarInventario(idFicha);
-    if (dados) setInventario(dados);
+    
+    const [dadosInv, dadosAtq] = await Promise.all([
+        buscarInventario(idFicha),
+        buscarAtaques(idFicha)
+    ]);
+
+    if (dadosInv) setInventario(dadosInv);
+    if (dadosAtq) setAtaques(dadosAtq);
+    
     setLoading(false);
   }
 
@@ -39,8 +46,7 @@ export function InventarioView({ idFicha }: InventarioViewProps) {
     return "bg-green-500 shadow-[0_0_10px_green]";
   };
 
-  // --- LÓGICA DE ATUALIZAÇÃO LOCAL (OTIMISTA) ---
-  
+  // --- Handlers de Atualização Local ---
   const handleCreateSuccess = (novoItem: ItemData) => {
     setInventario(prev => {
         if (!prev) return null;
@@ -51,7 +57,7 @@ export function InventarioView({ idFicha }: InventarioViewProps) {
         };
     });
     setModalAberto(false);
-    buscarInventario(idFicha); 
+    carregar(); 
   };
 
   const handleEditSuccess = (nomeOriginal: string, itemAtualizado: ItemData) => {
@@ -60,7 +66,6 @@ export function InventarioView({ idFicha }: InventarioViewProps) {
         const itemAntigo = prev.itens.find(i => i.nomeItem === nomeOriginal);
         const pesoAntigo = itemAntigo ? itemAntigo.espacos : 0;
         const novaLista = prev.itens.map(i => i.nomeItem === nomeOriginal ? itemAtualizado : i);
-
         return {
             ...prev,
             carga: { ...prev.carga, atual: prev.carga.atual - pesoAntigo + itemAtualizado.espacos },
@@ -69,7 +74,7 @@ export function InventarioView({ idFicha }: InventarioViewProps) {
     });
     setModalAberto(false);
     setItemParaEditar(null);
-    buscarInventario(idFicha); 
+    carregar(); 
   };
 
   const handleDeleteSuccess = (nomeItem: string) => {
@@ -78,7 +83,6 @@ export function InventarioView({ idFicha }: InventarioViewProps) {
         const itemRemovido = prev.itens.find(i => i.nomeItem === nomeItem);
         const pesoRemovido = itemRemovido ? itemRemovido.espacos : 0;
         const novaLista = prev.itens.filter(i => i.nomeItem !== nomeItem);
-
         return {
             ...prev,
             carga: { ...prev.carga, atual: prev.carga.atual - pesoRemovido },
@@ -87,7 +91,7 @@ export function InventarioView({ idFicha }: InventarioViewProps) {
     });
     setModalAberto(false);
     setItemParaEditar(null);
-    buscarInventario(idFicha);
+    carregar();
   };
 
   return (
@@ -150,16 +154,21 @@ export function InventarioView({ idFicha }: InventarioViewProps) {
             </button>
         </div>
 
-        {inventario.itens.map((item, idx) => (
-          <ItemCard 
-            key={idx} 
-            item={item} 
-            onEdit={() => {
-                setItemParaEditar(item);
-                setModalAberto(true);
-            }} 
-          />
-        ))}
+        {inventario.itens.map((item, idx) => {
+          const ataqueCorrespondente = ataques.find(atq => atq.nome === item.nomeItem);
+
+          return (
+            <ItemCard 
+              key={idx} 
+              item={item} 
+              ataque={ataqueCorrespondente}
+              onEdit={() => {
+                  setItemParaEditar(item);
+                  setModalAberto(true);
+              }} 
+            />
+          );
+        })}
         {inventario.itens.length === 0 && (
           <div className="text-center py-10 border border-dashed border-gray-800 rounded-xl text-gray-600">
             Mochila vazia.
@@ -167,7 +176,7 @@ export function InventarioView({ idFicha }: InventarioViewProps) {
         )}
       </section>
 
-      {/* MODAL DE FORMULÁRIO */}
+      {/* MODAL */}
       {modalAberto && (
         <ModalFormItem 
             idFicha={idFicha}
@@ -190,7 +199,34 @@ export function InventarioView({ idFicha }: InventarioViewProps) {
   );
 }
 
-// --- MODAL GENÉRICO (CRIAR, EDITAR E DELETAR) ---
+// --- SUB-COMPONENTES AUXILIARES ---
+
+function InfoItem({ icon, label, valor, capitalize = false }: any) {
+    return (
+      <div className="flex flex-col items-center justify-center p-2 bg-black/20 rounded-lg h-full">
+        <div className="flex items-center gap-1.5 mb-1 text-gray-400 text-[9px] md:text-[10px] uppercase font-bold text-center">
+          {icon} <span className="hidden md:inline">{label}</span> <span className="md:hidden">{label.slice(0,3)}.</span>
+        </div>
+        <span className={`text-white font-bold text-center text-xs md:text-sm leading-tight ${capitalize ? 'capitalize' : ''}`}>
+          {valor}
+        </span>
+      </div>
+    );
+}
+  
+function LimiteBox({ cat, valor }: { cat: string, valor: number }) {
+    const ativo = valor > 0;
+    return (
+      <div className={`
+        flex flex-col items-center justify-center w-full aspect-square md:aspect-auto md:h-14 rounded border 
+        ${ativo ? 'bg-[#1a1a1a] border-gray-600' : 'bg-[#121212] border-gray-800 opacity-40'}
+      `}>
+        <span className="text-[8px] md:text-[10px] text-gray-500 uppercase font-bold">Cat {cat}</span>
+        <span className={`text-base md:text-xl font-bold ${ativo ? 'text-white' : 'text-gray-700'}`}>{valor}</span>
+      </div>
+    );
+}
+
 interface ModalFormProps {
     idFicha: string;
     itemInicial: ItemData | null;
@@ -211,7 +247,6 @@ function ModalFormItem({ idFicha, itemInicial, onClose, onSuccess, onDeleteSucce
 
     const isEditing = !!itemInicial;
 
-    // Reset confirmação se fechar/abrir
     useEffect(() => {
         if (confirmDelete) {
             const timer = setTimeout(() => setConfirmDelete(false), 3000);
@@ -223,13 +258,11 @@ function ModalFormItem({ idFicha, itemInicial, onClose, onSuccess, onDeleteSucce
         e.preventDefault();
         setLoading(true);
         let sucesso = false;
-
         if (isEditing) {
             sucesso = await atualizarItemNoInventario(idFicha, itemInicial.nomeItem, form);
         } else {
             sucesso = await adicionarItemAoInventario(idFicha, form);
         }
-
         setLoading(false);
         if (sucesso) onSuccess(form);
         else alert(`Erro ao ${isEditing ? 'atualizar' : 'adicionar'} item.`);
@@ -247,104 +280,40 @@ function ModalFormItem({ idFicha, itemInicial, onClose, onSuccess, onDeleteSucce
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-200">
             <div className="bg-[#0d0d0d] border border-gray-700 w-full max-w-md rounded-xl shadow-2xl relative overflow-hidden animate-in zoom-in-95 duration-200">
-                
                 <div className="p-4 border-b border-gray-800 flex justify-between items-center bg-[#151515]">
                     <h3 className="font-bold text-white text-sm uppercase tracking-wider">
                         {isEditing ? `Editar: ${itemInicial.nomeItem}` : "Novo Item"}
                     </h3>
                     <button onClick={onClose} className="text-gray-500 hover:text-white"><X size={20} /></button>
                 </div>
-
                 <form onSubmit={handleSubmit} className="p-6 flex flex-col gap-4">
-                    
-                    {/* Nome */}
                     <div>
                         <label className="block text-xs text-gray-500 uppercase font-bold mb-1">Nome do Item</label>
-                        <input 
-                            required
-                            type="text" 
-                            className="w-full bg-[#1a1a1a] border border-gray-700 rounded p-2 text-white focus:border-harmonia-purple outline-none transition-colors"
-                            placeholder="Ex: Revólver"
-                            value={form.nomeItem}
-                            onChange={e => setForm({...form, nomeItem: e.target.value})}
-                        />
+                        <input required type="text" className="w-full bg-[#1a1a1a] border border-gray-700 rounded p-2 text-white focus:border-harmonia-purple outline-none transition-colors" placeholder="Ex: Revólver" value={form.nomeItem} onChange={e => setForm({...form, nomeItem: e.target.value})} />
                     </div>
-
                     <div className="grid grid-cols-2 gap-4">
-                        {/* Categoria */}
                         <div>
                             <label className="block text-xs text-gray-500 uppercase font-bold mb-1">Categoria</label>
-                            <select 
-                                className="w-full bg-[#1a1a1a] border border-gray-700 rounded p-2 text-white focus:border-harmonia-purple outline-none"
-                                value={form.categoria}
-                                onChange={e => setForm({...form, categoria: e.target.value})}
-                            >
-                                <option value="0">0</option>
-                                <option value="I">I</option>
-                                <option value="II">II</option>
-                                <option value="III">III</option>
-                                <option value="IV">IV</option>
-                                <option value="V">V</option>
-                                <option value="VI">VI</option>
+                            <select className="w-full bg-[#1a1a1a] border border-gray-700 rounded p-2 text-white focus:border-harmonia-purple outline-none" value={form.categoria} onChange={e => setForm({...form, categoria: e.target.value})}>
+                                <option value="0">0</option> <option value="I">I</option> <option value="II">II</option> <option value="III">III</option> <option value="IV">IV</option> <option value="V">V</option> <option value="VI">VI</option>
                             </select>
                         </div>
-
-                        {/* Espaços */}
                         <div>
                             <label className="block text-xs text-gray-500 uppercase font-bold mb-1">Espaços</label>
-                            <input 
-                                required
-                                type="number" 
-                                min="0"
-                                className="w-full bg-[#1a1a1a] border border-gray-700 rounded p-2 text-white focus:border-harmonia-purple outline-none"
-                                value={form.espacos}
-                                onChange={e => setForm({...form, espacos: Number(e.target.value)})}
-                            />
+                            <input required type="number" min="0" className="w-full bg-[#1a1a1a] border border-gray-700 rounded p-2 text-white focus:border-harmonia-purple outline-none" value={form.espacos} onChange={e => setForm({...form, espacos: Number(e.target.value)})} />
                         </div>
                     </div>
-
-                    {/* Descrição */}
                     <div>
                         <label className="block text-xs text-gray-500 uppercase font-bold mb-1">Descrição</label>
-                        <textarea 
-                            required
-                            rows={3}
-                            className="w-full bg-[#1a1a1a] border border-gray-700 rounded p-2 text-white focus:border-harmonia-purple outline-none resize-none"
-                            placeholder="Descrição do item..."
-                            value={form.descricao}
-                            onChange={e => setForm({...form, descricao: e.target.value})}
-                        />
+                        <textarea required rows={3} className="w-full bg-[#1a1a1a] border border-gray-700 rounded p-2 text-white focus:border-harmonia-purple outline-none resize-none" placeholder="Descrição do item..." value={form.descricao} onChange={e => setForm({...form, descricao: e.target.value})} />
                     </div>
-
                     <div className="flex gap-3 pt-2">
-                        {/* Botão de Deletar (Só aparece na edição) */}
                         {isEditing && (
-                            <button 
-                                type="button"
-                                onClick={() => {
-                                    if (confirmDelete) handleDelete();
-                                    else setConfirmDelete(true);
-                                }}
-                                disabled={loading}
-                                className={`
-                                    px-4 rounded font-bold transition-all flex items-center justify-center
-                                    ${confirmDelete 
-                                        ? "bg-red-600 hover:bg-red-700 text-white w-full" 
-                                        : "bg-red-900/20 hover:bg-red-900/40 text-red-500 border border-red-900/50"}
-                                `}
-                            >
-                                {loading ? <Loader2 className="animate-spin" size={20} /> : (
-                                    confirmDelete ? "Confirmar Exclusão?" : <Trash2 size={20} />
-                                )}
+                            <button type="button" onClick={() => { if (confirmDelete) handleDelete(); else setConfirmDelete(true); }} disabled={loading} className={`px-4 rounded font-bold transition-all flex items-center justify-center ${confirmDelete ? "bg-red-600 hover:bg-red-700 text-white w-full" : "bg-red-900/20 hover:bg-red-900/40 text-red-500 border border-red-900/50"}`}>
+                                {loading ? <Loader2 className="animate-spin" size={20} /> : (confirmDelete ? "Confirmar?" : <Trash2 size={20} />)}
                             </button>
                         )}
-
-                        {/* Botão Salvar */}
-                        <button 
-                            type="submit" 
-                            disabled={loading}
-                            className="flex-1 bg-harmonia-purple hover:bg-purple-700 text-white font-bold py-3 rounded transition-colors flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
-                        >
+                        <button type="submit" disabled={loading} className="flex-1 bg-harmonia-purple hover:bg-purple-700 text-white font-bold py-3 rounded transition-colors flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed">
                             {loading ? <Loader2 className="animate-spin" size={20} /> : (isEditing ? "Salvar" : "Criar")}
                         </button>
                     </div>
@@ -354,39 +323,13 @@ function ModalFormItem({ idFicha, itemInicial, onClose, onSuccess, onDeleteSucce
     );
 }
 
-// --- SUB-COMPONENTES AUXILIARES (INFO ITEM, LIMITE BOX, ITEM CARD) ---
-// (MANTIDOS IGUAIS AO CÓDIGO ANTERIOR, NÃO PRECISA ALTERAR)
-
-function InfoItem({ icon, label, valor, capitalize = false }: any) {
-  return (
-    <div className="flex flex-col items-center justify-center p-2 bg-black/20 rounded-lg h-full">
-      <div className="flex items-center gap-1.5 mb-1 text-gray-400 text-[9px] md:text-[10px] uppercase font-bold text-center">
-        {icon} <span className="hidden md:inline">{label}</span> <span className="md:hidden">{label.slice(0,3)}.</span>
-      </div>
-      <span className={`text-white font-bold text-center text-xs md:text-sm leading-tight ${capitalize ? 'capitalize' : ''}`}>
-        {valor}
-      </span>
-    </div>
-  );
-}
-
-function LimiteBox({ cat, valor }: { cat: string, valor: number }) {
-  const ativo = valor > 0;
-  return (
-    <div className={`
-      flex flex-col items-center justify-center w-full aspect-square md:aspect-auto md:h-14 rounded border 
-      ${ativo ? 'bg-[#1a1a1a] border-gray-600' : 'bg-[#121212] border-gray-800 opacity-40'}
-    `}>
-      <span className="text-[8px] md:text-[10px] text-gray-500 uppercase font-bold">Cat {cat}</span>
-      <span className={`text-base md:text-xl font-bold ${ativo ? 'text-white' : 'text-gray-700'}`}>{valor}</span>
-    </div>
-  );
-}
-
-function ItemCard({ item, onEdit }: { item: ItemData; onEdit: () => void }) {
+// --- ITEM CARD (SEM TAG DE DANO NO HEADER) ---
+function ItemCard({ item, onEdit, ataque }: { item: ItemData; onEdit: () => void, ataque?: AtaqueData }) {
   const [expandido, setExpandido] = useState(false);
   const isPrestigio = item.categoria !== "0";
-  const borderClass = isPrestigio ? "border-yellow-600/50 hover:border-yellow-500" : "border-gray-800 hover:border-gray-600";
+  const borderClass = ataque 
+    ? "border-red-900/50 hover:border-red-600 shadow-[0_0_10px_rgba(220,38,38,0.1)]" 
+    : (isPrestigio ? "border-yellow-600/50 hover:border-yellow-500" : "border-gray-800 hover:border-gray-600");
 
   return (
     <div className={`bg-[#1a1a1a] rounded-xl border transition-all duration-300 overflow-hidden ${expandido ? 'border-gray-500 shadow-lg' : borderClass}`}>
@@ -395,11 +338,14 @@ function ItemCard({ item, onEdit }: { item: ItemData; onEdit: () => void }) {
         className="p-3 md:p-4 flex items-center justify-between gap-3 cursor-pointer relative group"
       >
         <div className="flex items-center gap-3 overflow-hidden flex-1">
-          <span className="text-xl font-light text-gray-500 w-4 flex justify-center shrink-0 select-none">
-             {expandido ? "×" : "+"}
+          {/* Ícone de Espada se tiver ataque */}
+          <span className={`text-xl font-light w-4 flex justify-center shrink-0 select-none ${ataque ? 'text-red-500' : 'text-gray-500'}`}>
+             {expandido ? "×" : (ataque ? <Sword size={16}/> : "+")}
           </span>
           <div className="flex flex-col min-w-0">
-            <span className="text-sm md:text-base font-bold text-white truncate">{item.nomeItem}</span>
+            <span className={`text-sm md:text-base font-bold truncate ${ataque ? 'text-white' : 'text-gray-200'}`}>
+                {item.nomeItem}
+            </span>
             <div className="flex gap-2 mt-0.5">
               {item.categoria !== "0" && (
                 <span className="text-[9px] bg-yellow-900/40 text-yellow-500 border border-yellow-700/50 px-1.5 rounded uppercase font-bold tracking-wider">
@@ -429,6 +375,42 @@ function ItemCard({ item, onEdit }: { item: ItemData; onEdit: () => void }) {
       {expandido && (
         <div className="px-5 pb-5 pt-0 animate-in slide-in-from-top-2 duration-300">
            <div className="h-px w-full bg-gray-800 mb-3" />
+           
+           {/* SEÇÃO DE ATAQUE (SE HOUVER) */}
+           {ataque && (
+             <div className="mb-4 bg-red-950/20 border border-red-900/30 rounded-lg p-3">
+                <div className="flex items-center gap-2 mb-2 text-red-500 text-[10px] uppercase font-bold tracking-widest border-b border-red-900/30 pb-1">
+                    <Sword size={12} /> Dados de Combate
+                </div>
+                
+                <div className="grid grid-cols-2 gap-x-4 gap-y-2 text-xs">
+                    <div className="flex flex-col">
+                        <span className="text-gray-500 uppercase text-[9px]">Teste</span>
+                        <span className="text-white font-bold">{ataque.teste}</span>
+                    </div>
+                    <div className="flex flex-col">
+                        <span className="text-gray-500 uppercase text-[9px]">Dano</span>
+                        <span className="text-white font-bold">{ataque.dano}</span>
+                    </div>
+                    <div className="flex flex-col">
+                        <span className="text-gray-500 uppercase text-[9px]">Crítico</span>
+                        <span className="text-white font-bold">{ataque.critico}</span>
+                    </div>
+                    <div className="flex flex-col">
+                        <span className="text-gray-500 uppercase text-[9px]">Alcance</span>
+                        <span className="text-white font-bold">{ataque.alcance}</span>
+                    </div>
+                </div>
+
+                {ataque.especial && (
+                    <div className="mt-2 pt-2 border-t border-red-900/30">
+                        <span className="text-gray-500 uppercase text-[9px] block">Especial</span>
+                        <span className="text-red-200 text-xs italic">{ataque.especial}</span>
+                    </div>
+                )}
+             </div>
+           )}
+
            <p className="text-sm text-gray-300 whitespace-pre-line leading-relaxed text-justify">
              {item.descricao}
            </p>

@@ -123,3 +123,12 @@ export interface InventarioData {
   limiteItens: LimitesCategoria;
   itens: ItemData[];
 }
+
+export interface AtaqueData {
+  nome: string;
+  teste: string;
+  dano: string;
+  critico: number;
+  alcance: string;
+  especial: string;
+}
