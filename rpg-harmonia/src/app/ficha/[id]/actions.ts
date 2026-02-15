@@ -168,3 +168,95 @@ export async function atualizarFicha(idFicha: string, payload: any) {
     return false;
   }
 }
+
+export async function adicionarItemAoInventario(idFicha: string, item: { nomeItem: string, categoria: string, espacos: number, descricao: string }) {
+  const cookieStore = await cookies();
+  const token = cookieStore.get("auth_token")?.value;
+
+  if (!token) return false;
+
+  try {
+    const res = await fetch(`https://harmonia-rpg.onrender.com/api/v1/ficha/${idFicha}/inventario/itens`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`
+      },
+      body: JSON.stringify(item)
+    });
+
+    if (!res.ok) {
+      console.error("Erro ao adicionar item:", res.status);
+      return false;
+    }
+
+    return true;
+  } catch (error) {
+    console.error("Erro de conexão:", error);
+    return false;
+  }
+}
+
+export async function atualizarItemNoInventario(
+  idFicha: string, 
+  nomeOriginal: string, 
+  novoItem: { nomeItem: string, categoria: string, espacos: number, descricao: string }
+) {
+  const cookieStore = await cookies();
+  const token = cookieStore.get("auth_token")?.value;
+
+  if (!token) return false;
+
+  try {
+    // A URL usa o nome original (codificado para URL, caso tenha espaços)
+    const url = `https://harmonia-rpg.onrender.com/api/v1/ficha/${idFicha}/inventario/itens/${encodeURIComponent(nomeOriginal)}`;
+    
+    const res = await fetch(url, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`
+      },
+      body: JSON.stringify(novoItem)
+    });
+
+    if (!res.ok) {
+      console.error("Erro ao atualizar item:", res.status);
+      return false;
+    }
+
+    return true;
+  } catch (error) {
+    console.error("Erro de conexão:", error);
+    return false;
+  }
+}
+
+export async function deletarItemDoInventario(idFicha: string, nomeItem: string) {
+  const cookieStore = await cookies();
+  const token = cookieStore.get("auth_token")?.value;
+
+  if (!token) return false;
+
+  try {
+    // Codifica o nome do item para a URL (ex: "Kit Médico" -> "Kit%20M%C3%A9dico")
+    const url = `https://harmonia-rpg.onrender.com/api/v1/ficha/${idFicha}/inventario/itens/${encodeURIComponent(nomeItem)}`;
+    
+    const res = await fetch(url, {
+      method: "DELETE",
+      headers: {
+        "Authorization": `Bearer ${token}`
+      }
+    });
+
+    if (!res.ok) {
+      console.error("Erro ao deletar item:", res.status);
+      return false;
+    }
+
+    return true;
+  } catch (error) {
+    console.error("Erro de conexão:", error);
+    return false;
+  }
+}
