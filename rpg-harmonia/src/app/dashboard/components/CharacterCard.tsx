@@ -1,8 +1,9 @@
 "use client";
 import { User, ArrowUpRight } from "lucide-react";
-import { Button } from "@/components/ui/Button";
+import { CustomButton } from "@/components/ui/CustomButton";
 import { InfoDisplay } from "@/components/ui/InfoDisplay";
 import Link from "next/link";
+import Image from "next/image";
 
 interface CharacterCardProps {
   id: string;
@@ -23,11 +24,7 @@ export function CharacterCard({ id, nome, campanha, criadoEm, imgPersonagem }: C
         <div className="w-16 h-16 md:w-20 md:h-20 rounded-full shrink-0 border-2 border-gray-600 group-hover:border-harmonia-purple transition-colors shadow-lg overflow-hidden relative bg-gray-800">
           
           {imgPersonagem ? (
-            <img 
-              src={imgPersonagem} 
-              alt={`Personagem ${nome}`}
-              className="w-full h-full object-cover"
-            />
+            <Image src={imgPersonagem} alt={`Personagem ${nome}`} width={50} height={100} className="w-full h-full object-cover" />
           ) : (
             <div className="w-full h-full bg-white flex items-center justify-center text-black">
               <User size={32} className="md:w-10 md:h-10" />
@@ -56,13 +53,13 @@ export function CharacterCard({ id, nome, campanha, criadoEm, imgPersonagem }: C
 
       <div className="w-full md:w-auto shrink-0">
         <Link href={`/ficha/${id}`} className="w-full md:w-auto">
-          <Button 
+          <CustomButton 
             variant="primary" 
             className="w-full md:w-auto gap-2 px-6 text-sm md:text-base"
           >
             Acessar
             <ArrowUpRight size={18} />
-          </Button>
+          </CustomButton>
         </Link>
       </div>
     </div>

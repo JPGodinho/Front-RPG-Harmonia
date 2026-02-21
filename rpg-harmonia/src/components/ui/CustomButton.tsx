@@ -7,7 +7,7 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   isLoading?: boolean;
 }
 
-export function Button({ 
+export function CustomButton({ 
   children, 
   variant = "primary", 
   isLoading = false, 
