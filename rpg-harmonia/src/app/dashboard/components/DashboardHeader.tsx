@@ -1,6 +1,7 @@
 // src/app/dashboard/components/DashboardHeader.tsx
 import { HeaderRoot } from "@/components/header/HeaderRoot";
 import { HeaderMenuButton, HeaderLogoutButton } from "@/components/header/HeaderButtons";
+import { SidebarTrigger } from "@/components/ui/sidebar";
 
 interface DashboardHeaderProps {
   nomeUsuario: string;
@@ -8,10 +9,7 @@ interface DashboardHeaderProps {
 
 export function DashboardHeader({ nomeUsuario }: DashboardHeaderProps) {
   return (
-    <HeaderRoot 
-      left={<HeaderMenuButton />} 
-      right={<HeaderLogoutButton />}
-    >
+    <HeaderRoot left={<SidebarTrigger className="-ml-1" />}>
       <span>Olá, <span className="text-harmonia-purple capitalize">{nomeUsuario}</span>!</span>
     </HeaderRoot>
   );

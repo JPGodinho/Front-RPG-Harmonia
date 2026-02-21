@@ -1,4 +1,6 @@
+import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import { HeaderFicha } from "./components/HeaderFicha";
+import { AppSidebar } from "@/components/app-sidebar";
 
 export default function FichaLayout({
   children,
@@ -6,17 +8,14 @@ export default function FichaLayout({
   children: React.ReactNode
 }) {
   return (
-    <div className="bg-harmonia-bg text-white">
-      
-      <div className="max-w-4xl mx-auto p-4 md:px-8">
-        
+    <SidebarProvider className="min-h-screen bg-harmonia-bg text-white p-4 md:p-8">
+      <AppSidebar />
+      <SidebarInset >
         <HeaderFicha />
-        
         <main className="mt-4">
           {children}
-        </main>
-
-      </div>
-    </div>
+          </main>
+      </SidebarInset>
+    </SidebarProvider>
   );
 }

@@ -1,8 +1,6 @@
 "use client";
 import { Menu, LogOut, ChevronLeft } from "lucide-react";
 import { useRouter } from "next/navigation";
-import Link from "next/link";
-import router from "next/dist/shared/lib/router/router";
 import { logout } from "@/app/actions/auth";
 
 export function HeaderBackButton() {
@@ -13,7 +11,7 @@ export function HeaderBackButton() {
       className="hover:bg-white/10 p-2 rounded-full transition-colors text-harmonia-purple"
       title="Voltar"
     >
-      <ChevronLeft size={28} /> 
+      <ChevronLeft size={20} /> 
     </button>
   );
 }
@@ -25,7 +23,7 @@ export function HeaderMenuButton({ onClick }: { onClick?: () => void }) {
       className="hover:bg-white/10 p-2 rounded-full transition-colors text-harmonia-purple"
       title="Abrir Menu"
     >
-      <Menu size={28} />
+      <Menu size={12} />
     </button>
   );
 }
