@@ -150,11 +150,11 @@ export default function FichaClient({ dadosIniciais }: FichaClientProps) {
   );
 
   return (
-    <div className="p-4 md:p-8 pb-20">
-      <div className="max-w-4xl mx-auto">
+    <>
+      <div className="mx-auto">
         
         <InfoPersonagem 
-          imgPersonagem={dadosIniciais.imgPersonagem || undefined}
+          imgPersonagem={dadosIniciais.imgPersonagem}
           nome={dadosIniciais.personagem}
           idade={`${dadosIniciais.idade} anos`}
           nex={`${dadosIniciais.nivelExposicao}%`}
@@ -224,6 +224,6 @@ export default function FichaClient({ dadosIniciais }: FichaClientProps) {
 
         </div>
       </div>
-    </div>
+    </>
   );
 }

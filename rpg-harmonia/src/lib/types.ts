@@ -5,7 +5,7 @@ export interface StatusPontos {
 
 export interface FichaData {
   id: string;
-  imgPersonagem?: string | null;
+  imgPersonagem: string;
   personagem: string;
   idade: number;
   nivelExposicao: number; // NEX

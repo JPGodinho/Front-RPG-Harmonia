@@ -12,7 +12,7 @@ export function DashboardHeader({ nomeUsuario }: DashboardHeaderProps) {
       left={<HeaderMenuButton />} 
       right={<HeaderLogoutButton />}
     >
-      <span>Olá, <span className="text-harmonia-purple capitalize">{nomeUsuario}</span></span>
+      <span>Olá, <span className="text-harmonia-purple capitalize">{nomeUsuario}</span>!</span>
     </HeaderRoot>
   );
 }

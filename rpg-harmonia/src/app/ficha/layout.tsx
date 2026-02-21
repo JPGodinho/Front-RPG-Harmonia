@@ -6,9 +6,9 @@ export default function FichaLayout({
   children: React.ReactNode
 }) {
   return (
-    <div className="min-h-[200vh] bg-harmonia-bg text-white">
+    <div className="bg-harmonia-bg text-white">
       
-      <div className="max-w-4xl mx-auto p-4 md:px-8 pb-20">
+      <div className="max-w-4xl mx-auto p-4 md:px-8">
         
         <HeaderFicha />
         

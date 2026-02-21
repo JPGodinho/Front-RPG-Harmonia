@@ -69,7 +69,7 @@ export function AtributosGrid({ atributos, listaPericiasAtual, selecionado, onTo
   else if (selecionado === "Vigor") corTextoAtual = "text-green-500";
 
   return (
-    <section className="max-w-3xl mx-auto mb-20">
+    <section className="max-w-3xl mx-auto">
       
       <div className="grid grid-cols-5 gap-2 md:gap-8">
          <AtributoBotao 

@@ -1,7 +1,9 @@
 "use client";
 
+import Image from "next/image";
+
 interface InfoPersonagemProps {
-  imgPersonagem?: string;
+  imgPersonagem: string;
   nome: string;
   idade: string;
   nex: string;
@@ -34,9 +36,8 @@ export function InfoPersonagem({
     <section className="bg-[#1a1a1a] border border-gray-800 rounded-xl p-5 mb-3 shadow-lg relative overflow-hidden">
       
       <div className="flex items-center gap-4 mb-1">
-        
-        <div className="w-16 h-16 rounded-full bg-gray-800 border-2 border-harmonia-purple flex items-center justify-center shrink-0 shadow-[0_0_15px_rgba(227,0,255,0.3)]">
-          <img src={imgPersonagem} alt="Personagem" className="w-full h-full object-cover rounded-full" />
+        <div className="w-auto h-auto md:rounded rounded-sm bg-gray-800 border-2 border-harmonia-purple flex items-center justify-center shrink-0 shadow-[0_0_15px_rgba(227,0,255,0.3)]">
+              <Image src={imgPersonagem} alt="Personagem" width={50} height={100} className="w-full h-full object-cover md:rounded rounded-sm" />
         </div>
 
         <div className="flex flex-col flex-1 text-center">
@@ -74,9 +75,9 @@ export function InfoPersonagem({
         </div>
       </div>
 
-      <div className="bg-black/30 rounded-lg p-2 text-center mt-1 border border-gray-800/50">
+      <div className="p-2 text-center mt-1 border-t border-gray-800">
         <span className="text-gray-300 text-xs md:text-sm font-medium">
-          {classe} de {trilha} <span className="text-gray-600 mx-1">•</span> <span className={`${corElemento} font-bold uppercase`}>{elemento}</span>
+          {classe} de {trilha.replace("_", " ")} <span className="text-gray-600 mx-1">•</span> <span className={`${corElemento} font-bold uppercase`}>{elemento}</span>
         </span>
       </div>
 
