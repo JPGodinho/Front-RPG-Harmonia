@@ -1,7 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import { Plus } from "lucide-react";
-import { Button } from "@/components/ui/Button";
+import { CustomButton } from "@/components/ui/CustomButton";
 import { CharacterCard } from "./components/CharacterCard";
 import { formatarDataFirestore } from "@/lib/utils"; 
 import { buscarMeusAgentes } from "./actions"; 
@@ -30,10 +30,10 @@ export default function DashboardPage() {
           <p className="text-sm text-gray-400">Gerencie suas fichas e evolua seus agentes.</p>
         </div>
 
-        <Button variant="secondary" onClick={() => alert("Em breve...")}>
+        <CustomButton variant="secondary" onClick={() => alert("Em breve...")}>
           <Plus size={20} />
           Criar Novo Agente
-        </Button>
+        </CustomButton>
       </section>
 
       {!carregando && meusPersonagens.length > 0 ? (
