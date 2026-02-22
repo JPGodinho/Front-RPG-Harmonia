@@ -27,7 +27,6 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar"
 import { logout } from "@/app/actions/auth"
-import Link from "next/link"
 import { redirect } from "next/navigation"
 
 export function NavUser({
@@ -39,7 +38,13 @@ export function NavUser({
     avatar: string
   }
 }) {
-  const { isMobile } = useSidebar()
+  const { isMobile, setOpen, setOpenMobile } = useSidebar()
+
+  async function handleLogout() {
+    setOpen(false)
+    setOpenMobile(false)
+    await logout()
+  }
 
   return (
     <SidebarMenu>
@@ -88,13 +93,15 @@ export function NavUser({
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
-              <DropdownMenuItem onClick={() => redirect("/perfil")}>
-                <Settings2 />
-                Perfil
-              </DropdownMenuItem>
+              <a href="/perfil">
+                <DropdownMenuItem>
+                  <Settings2 />
+                  Perfil
+                </DropdownMenuItem>
+              </a>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={() => logout()}> 
+            <DropdownMenuItem onClick={handleLogout}> 
               <LogOut />
               Sair
             </DropdownMenuItem>

@@ -13,16 +13,11 @@ import {
   Sidebar,
   SidebarContent,
   SidebarFooter,
-  SidebarHeader,
   SidebarRail,
 } from "@/components/ui/sidebar"
 
-const data = {
-  user: {
-    name: "teste m",
-    email: "",
-    avatar: ""
-  }, 
+
+const data = { 
   navMain: [
     {
       title: "Ações",
@@ -45,14 +40,24 @@ const data = {
   ]
 }
 
-export function AppSidebar({...props }: React.ComponentProps<typeof Sidebar>) {
+export function AppSidebar({
+  username,
+  ...props
+}: React.ComponentProps<typeof Sidebar> & { username: string }) {
+
+  const user = {
+    name: username,
+    email: "",
+    avatar: "",
+  }
+
   return (
     <Sidebar collapsible="icon" {...props}>
       <SidebarContent>
         <NavMain items={data.navMain} />
       </SidebarContent>
       <SidebarFooter>
-        <NavUser user={data.user} />
+        <NavUser user={user} />
       </SidebarFooter>
       <SidebarRail />
     </Sidebar>
