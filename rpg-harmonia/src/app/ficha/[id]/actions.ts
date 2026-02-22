@@ -15,8 +15,7 @@ export async function buscarPericiasDaFicha(idFicha: string): Promise<ListaDePer
       headers: {
         "Content-Type": "application/json",
         "Authorization": `Bearer ${token}`
-      },
-      next: { revalidate: 60 } 
+      }
     });
 
     if (!res.ok) {
@@ -44,8 +43,7 @@ export async function buscarDescricao(idFicha: string): Promise<DescricaoData | 
       headers: {
         "Content-Type": "application/json",
         "Authorization": `Bearer ${token}`
-      },
-      next: { revalidate: 60 } 
+      }
     });
 
     if (!res.ok) return null;
@@ -69,8 +67,7 @@ export async function buscarRituais(idFicha: string): Promise<RitualData[] | nul
       headers: {
         "Content-Type": "application/json",
         "Authorization": `Bearer ${token}`
-      },
-      next: { revalidate: 60 } 
+      }
     });
 
     if (!res.ok) return null;
@@ -94,8 +91,7 @@ export async function buscarHabilidades(idFicha: string): Promise<HabilidadeData
       headers: {
         "Content-Type": "application/json",
         "Authorization": `Bearer ${token}`
-      },
-      next: { revalidate: 60 } 
+      }, 
     });
 
     if (!res.ok) return null;
@@ -119,8 +115,7 @@ export async function buscarInventario(idFicha: string): Promise<InventarioData 
       headers: {
         "Content-Type": "application/json",
         "Authorization": `Bearer ${token}`
-      },
-      next: { revalidate: 60 } 
+      } 
     });
 
     if (!res.ok) return null;

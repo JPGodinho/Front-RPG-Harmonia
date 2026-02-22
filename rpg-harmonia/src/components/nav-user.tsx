@@ -27,7 +27,6 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar"
 import { logout } from "@/app/actions/auth"
-import { redirect } from "next/navigation"
 
 export function NavUser({
   user,
