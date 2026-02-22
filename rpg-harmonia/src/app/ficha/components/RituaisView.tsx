@@ -52,6 +52,16 @@ export function RituaisView({ idFicha, peAtual, onGastarPE }: RituaisViewProps) 
   );
 }
 
+export const LinhaDetalhe = ({ label, valor, destaque = false }: { label: string, valor: string | number | null, destaque?: boolean }) => {
+    if (!valor) return null;
+    return (
+      <div className="flex gap-1">
+        <strong className={`${destaque ? "text-red-500" : "text-white"}`}>{label}:</strong>
+        <span className={`${destaque ? "text-red-400 font-bold" : "text-gray-400"}`}>{valor}</span>
+      </div>
+    );
+};
+
 function RitualCard({ ritual, onUsar }: { ritual: RitualData; onUsar: () => void }) {
   const [expandido, setExpandido] = useState(false);
 
@@ -67,16 +77,6 @@ function RitualCard({ ritual, onUsar }: { ritual: RitualData; onUsar: () => void
   };
 
   const cores = getCores(ritual.tipoElemento);
-
-  const LinhaDetalhe = ({ label, valor, destaque = false }: { label: string, valor: string | number | null, destaque?: boolean }) => {
-    if (!valor) return null;
-    return (
-      <div className="flex gap-1">
-        <strong className={`${destaque ? "text-red-500" : "text-white"}`}>{label}:</strong>
-        <span className={`${destaque ? "text-red-400 font-bold" : "text-gray-400"}`}>{valor}</span>
-      </div>
-    );
-  };
 
   return (
     <div 
@@ -117,6 +117,19 @@ function RitualCard({ ritual, onUsar }: { ritual: RitualData; onUsar: () => void
           `}
         >
           Usar Ritual
+        </button>
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            
+          }}
+         className={`
+            shrink-0 px-3 py-1.5 md:px-5 md:py-1.5 rounded-full border border-current 
+            text-[10px] md:text-xs font-bold uppercase tracking-widest 
+            hover:bg-white/10 transition-colors active:scale-95
+            ${cores.textBtn}
+          `}>
+          EDITAR
         </button>
       </div>
 

@@ -1,5 +1,6 @@
 "use client";
 
+import { User } from "lucide-react";
 import Image from "next/image";
 
 interface InfoPersonagemProps {
@@ -37,7 +38,14 @@ export function InfoPersonagem({
       
       <div className="flex items-center gap-4 mb-1">
         <div className="w-auto h-auto md:rounded rounded-sm bg-gray-800 border-2 border-harmonia-purple flex items-center justify-center shrink-0 shadow-[0_0_15px_rgba(227,0,255,0.3)]">
-          <Image src={imgPersonagem} alt="Personagem" width={50} height={100} className="w-full h-full object-cover md:rounded rounded-sm" />
+          {imgPersonagem ? 
+            (
+              <Image src={imgPersonagem} alt="Personagem" width={50} height={100} className="w-full h-full object-cover md:rounded rounded-sm"/>
+            ):(
+              <div className="flex items-center justify-center w-16 h-[90px] object-cover md:rounded rounded-sm">
+                <User size={50}></User>
+              </div>
+            )}
         </div>
 
         <div className="flex flex-col flex-1 text-center">

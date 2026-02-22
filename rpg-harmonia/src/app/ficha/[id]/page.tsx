@@ -13,8 +13,7 @@ async function getFicha(idFicha: string) {
       headers: {
         "Content-Type": "application/json",
         "Authorization": `Bearer ${token}`
-      },
-      next: { revalidate: 0 } 
+      } 
     });
 
     if (!res.ok) return null;
