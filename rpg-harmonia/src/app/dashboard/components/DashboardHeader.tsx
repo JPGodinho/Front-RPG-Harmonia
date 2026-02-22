@@ -1,6 +1,5 @@
 // src/app/dashboard/components/DashboardHeader.tsx
 import { HeaderRoot } from "@/components/header/HeaderRoot";
-import { HeaderMenuButton, HeaderLogoutButton } from "@/components/header/HeaderButtons";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 
 interface DashboardHeaderProps {

@@ -1,6 +1,6 @@
 "use client";
 import { HeaderRoot } from "@/components/header/HeaderRoot";
-import { HeaderBackButton, HeaderLogoutButton } from "@/components/header/HeaderButtons";
+import { HeaderBackButton } from "@/components/header/HeaderButtons";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 
 export function HeaderFicha() {
