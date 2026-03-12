@@ -33,18 +33,10 @@ export function useInventario(idFicha: string) {
 		};
 	}, [idFicha]);
 
-	const getCorBarra = (inventario: InventarioData) => {
-		const { atual, total } = inventario.carga;
-		if (atual > total) return "bg-red-600 shadow-[0_0_10px_red]";
-		if (atual === total) return "bg-harmonia-purple shadow-[0_0_10px_#E300FF]";
-		return "bg-green-500 shadow-[0_0_10px_green]";
-	};
-
 	return {
 		inventario,
 		ataques,
 		loading,
-		setInventario,
-		getCorBarra
+		setInventario
 	};
 }
