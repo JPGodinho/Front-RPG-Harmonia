@@ -1,8 +1,5 @@
 "use client";
 
-import { useState } from "react";
-import { ItemData } from "@/lib/types";
-
 import { useInventario } from "../hooks/useInventario";
 import { ItemCard } from "./ui/ItemCard";
 import { ModalFormItem } from "./ui/ModalFormItem";
@@ -16,61 +13,23 @@ interface Props {
 
 export function InventarioView({ idFicha }: Props) {
 
-  const { inventario, ataques, loading, setInventario } =
-    useInventario(idFicha);
-
-  const [modalAberto, setModalAberto] = useState(false);
-  const [itemParaEditar, setItemParaEditar] = useState<ItemData | null>(null);
+  const {
+    inventario,
+    ataques,
+    loading,
+    itemParaEditar,
+    modalAberto,
+    setModalAberto,
+    setItemParaEditar,
+    handleCreateSuccess,
+    handleDeleteSuccess,
+    handleEditSuccess,
+  } = useInventario(idFicha);
 
   if (loading && !inventario) 
     return <div className="text-center py-10 text-gray-500 animate-pulse">Verificando equipamentos...</div>;
   if (!inventario) 
     return <div className="text-center py-10 text-gray-500">Inventário vazio ou inacessível.</div>;
-
-  const handleCreateSuccess = (novoItem: ItemData) => {
-    setInventario(prev => {
-        if (!prev) return null;
-        return {
-            ...prev,
-            carga: { ...prev.carga, atual: prev.carga.atual + novoItem.espacos },
-            itens: [...prev.itens, novoItem]
-        };
-    });
-    setModalAberto(false);
-  };
-
-  const handleDeleteSuccess = (nomeItem: string) => {
-    setInventario(prev => {
-        if (!prev) return null;
-        const itemRemovido = prev.itens.find(i => i.nomeItem === nomeItem);
-        const pesoRemovido = itemRemovido ? itemRemovido.espacos : 0;
-        const novaLista = prev.itens.filter(i => i.nomeItem !== nomeItem);
-        return {
-            ...prev,
-            carga: { ...prev.carga, atual: prev.carga.atual - pesoRemovido },
-            itens: novaLista
-        };
-    });
-    setModalAberto(false);
-    setItemParaEditar(null);
-  };
-
-  const handleEditSuccess = (nomeOriginal: string, itemAtualizado: ItemData) => {
-    setInventario(prev => {
-        if (!prev) return null;
-        const itemAntigo = prev.itens.find(i => i.nomeItem === nomeOriginal);
-        const pesoAntigo = itemAntigo ? itemAntigo.espacos : 0;
-        const novaLista = prev.itens.map(i => i.nomeItem === nomeOriginal ? itemAtualizado : i);
-        return {
-            ...prev,
-            carga: { ...prev.carga, atual: prev.carga.atual - pesoAntigo + itemAtualizado.espacos },
-            itens: novaLista
-        };
-    });
-    setModalAberto(false);
-    setItemParaEditar(null);
-  };
-
 
   return (
     <div className="max-w-4xl mx-auto pb-20 flex flex-col gap-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
