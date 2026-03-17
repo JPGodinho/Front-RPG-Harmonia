@@ -1,11 +1,10 @@
 'use server';
 
-import { cookies } from 'next/headers';
 import { AtaqueData, DescricaoData, HabilidadeData, InventarioData, ListaDePericias, RitualData } from '@/lib/types';
+import { getToken } from './utils';
 
 export async function buscarPericiasDaFicha(idFicha: string): Promise<ListaDePericias | null> {
-  const cookieStore = await cookies();
-  const token = cookieStore.get("auth_token")?.value;
+  const {token } = await getToken();
 
   if (!token) return null;
 
@@ -32,8 +31,7 @@ export async function buscarPericiasDaFicha(idFicha: string): Promise<ListaDePer
 
 
 export async function buscarDescricao(idFicha: string): Promise<DescricaoData | null> {
-  const cookieStore = await cookies();
-  const token = cookieStore.get("auth_token")?.value;
+  const {token } = await getToken();
 
   if (!token) return null;
 
@@ -56,13 +54,12 @@ export async function buscarDescricao(idFicha: string): Promise<DescricaoData | 
 }
 
 export async function buscarRituais(idFicha: string): Promise<RitualData[] | null> {
-  const cookieStore = await cookies();
-  const token = cookieStore.get("auth_token")?.value;
+  const {token } = await getToken();
 
   if (!token) return null;
 
   try {
-    const res = await fetch(`https://harmonia-rpg.onrender.com/api/v1/ficha/${idFicha}/rituais`, {
+    const res = await fetch(`https://harmonia-rpg.onrender.com/api/v2/ficha/${idFicha}/rituais`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -70,7 +67,10 @@ export async function buscarRituais(idFicha: string): Promise<RitualData[] | nul
       }
     });
 
-    if (!res.ok) return null;
+    if (!res.ok) {
+      console.error(await res.json())
+      return null
+    };
 
     return await res.json();
   } catch (error) {
@@ -80,8 +80,7 @@ export async function buscarRituais(idFicha: string): Promise<RitualData[] | nul
 }
 
 export async function buscarHabilidades(idFicha: string): Promise<HabilidadeData[] | null> {
-  const cookieStore = await cookies();
-  const token = cookieStore.get("auth_token")?.value;
+  const {token } = await getToken();
 
   if (!token) return null;
 
@@ -104,8 +103,7 @@ export async function buscarHabilidades(idFicha: string): Promise<HabilidadeData
 }
 
 export async function buscarInventario(idFicha: string): Promise<InventarioData | null> {
-  const cookieStore = await cookies();
-  const token = cookieStore.get("auth_token")?.value;
+  const {token } = await getToken();
 
   if (!token) return null;
 
@@ -128,9 +126,7 @@ export async function buscarInventario(idFicha: string): Promise<InventarioData 
 }
 
 export async function atualizarFicha(idFicha: string, payload: any) {
-  const cookieStore = await cookies();
-  const token = cookieStore.get("auth_token")?.value;
-  const idUsuario = cookieStore.get("user_id")?.value; // <--- LENDO DO COOKIE
+  const { token, idUsuario } = await getToken();
 
   if (!token) {
     console.error("Sem token de autenticação");
@@ -153,7 +149,7 @@ export async function atualizarFicha(idFicha: string, payload: any) {
     });
 
     if (!res.ok) {
-      console.error("Erro na API de atualização:", res.status);
+      console.error("Erro na API de atualização:", res.status, await res.json());
       return false;
     }
 
@@ -165,8 +161,7 @@ export async function atualizarFicha(idFicha: string, payload: any) {
 }
 
 export async function adicionarItemAoInventario(idFicha: string, item: { nomeItem: string, categoria: string, espacos: number, descricao: string }) {
-  const cookieStore = await cookies();
-  const token = cookieStore.get("auth_token")?.value;
+  const {token } = await getToken();
 
   if (!token) return false;
 
@@ -197,8 +192,7 @@ export async function atualizarItemNoInventario(
   nomeOriginal: string, 
   novoItem: { nomeItem: string, categoria: string, espacos: number, descricao: string }
 ) {
-  const cookieStore = await cookies();
-  const token = cookieStore.get("auth_token")?.value;
+  const {token } = await getToken();
 
   if (!token) return false;
 
@@ -228,8 +222,7 @@ export async function atualizarItemNoInventario(
 }
 
 export async function deletarItemDoInventario(idFicha: string, nomeItem: string) {
-  const cookieStore = await cookies();
-  const token = cookieStore.get("auth_token")?.value;
+  const {token } = await getToken();
 
   if (!token) return false;
 
@@ -257,8 +250,7 @@ export async function deletarItemDoInventario(idFicha: string, nomeItem: string)
 }
 
 export async function buscarAtaques(idFicha: string): Promise<AtaqueData[] | null> {
-  const cookieStore = await cookies();
-  const token = cookieStore.get("auth_token")?.value;
+  const {token } = await getToken();
 
   if (!token) return null;
 
@@ -278,5 +270,96 @@ export async function buscarAtaques(idFicha: string): Promise<AtaqueData[] | nul
   } catch (error) {
     console.error("Erro ao buscar ataques:", error);
     return null;
+  }
+}
+
+export async function adicionarRitual(idFicha: string, ritual: RitualData) {
+  const {token } = await getToken();
+
+  if (!token) return false;
+  
+  try {
+    const res = await fetch(`https://harmonia-rpg.onrender.com/api/v2/ficha/${idFicha}/rituais`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`
+      },
+      body: JSON.stringify(ritual)
+    });
+
+    if (!res.ok) {
+      console.error(await res.json())
+      console.error("Erro ao adicionar ritual:", res.status);
+      return false;
+    }
+
+    return true;
+  } catch (error) {
+    console.error("Erro de conexão:", error);
+    return false;
+  }
+}
+
+export async function atualizarRitual(idFicha: string, ritual: RitualData) {
+  const {token } = await getToken();
+
+  if (!token) return false;
+  if (ritual.idRitual == null) {
+    console.error("Id do ritual não pode ser nulo.")
+    return false;
+  }
+
+  try {
+    const res = await fetch(`https://harmonia-rpg.onrender.com/api/v2/ficha/${idFicha}/rituais?id-ritual=${ritual.idRitual}`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`
+      },
+      body: JSON.stringify(ritual)
+    });
+
+    if (!res.ok) {
+      console.error(await res.json())
+      console.error("Erro ao atualizar ritual:", res.status);
+      return false;
+    }
+
+    return true;
+  } catch (error) {
+    console.error("Erro de conexão:", error);
+    return false;
+  }
+}
+
+export async function deletarRitual(idFicha: string, ritual: RitualData) {
+  const {token } = await getToken();
+
+  if (!token) return false;
+  if (ritual.idRitual == null) {
+    console.error("Id do ritual não pode ser nulo.")
+    return false;
+  }
+
+  try {
+    const res = await fetch(`https://harmonia-rpg.onrender.com/api/v2/ficha/${idFicha}/rituais?id-ritual=${ritual.idRitual}`, {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`
+      },
+      body: JSON.stringify(ritual)
+    });
+
+    if (!res.ok) {
+      console.error("Erro ao deletar ritual:", res.status);
+      return false;
+    }
+
+    return true;
+  } catch (error) {
+    console.error("Erro de conexão:", error);
+    return false;
   }
 }
