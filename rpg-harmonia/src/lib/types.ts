@@ -76,9 +76,18 @@ export interface CustoRitual {
   verdadeiro: number;
 }
 
+export type TipoElemento =
+  "MORTE" 
+  | "SANGUE" 
+  | "ENERGIA" 
+  | "CONHECIMENTO" 
+  | "MEDO" 
+  | undefined
+  
 export interface RitualData {
+  idRitual?: string;
   nomeRitual: string;
-  tipoElemento: "MORTE" | "SANGUE" | "ENERGIA" | "CONHECIMENTO" | "MEDO";
+  tipoElemento: TipoElemento;
   custoRitual: CustoRitual;
   execucao: string;
   alcance: string;
