@@ -3,9 +3,7 @@
 import { useRituais } from "../hooks/useRituais";
 import { RitualModal } from "./ui/RitualModal";
 import { RitualCard } from "./ui/RitualCard";
-import { useState } from "react";import { ModalFormRitual } from "./ui/ModalFormRitual";
-import { RitualData } from "@/lib/types";
-
+import { ModalFormRitual } from "./ui/ModalFormRitual";
 interface RituaisViewProps {
   idFicha: string;
   peAtual: number;
@@ -14,36 +12,41 @@ interface RituaisViewProps {
 
 export function RituaisView({ idFicha, peAtual, onGastarPE }: RituaisViewProps) {
 
-  const { rituais, loading, ritualParaConjurar, setRitualParaConjurar, refetch, setRefetch } = useRituais(idFicha);
-  const [modalEdit, setModalEdit] = useState(false);
-  const [ritualEditar, setRitualEditar] = useState<RitualData | undefined>();
+  const { 
+    rituais,
+    loading,
+    ritualParaConjurar,
+    modalEdit,
+    ritualEditar,
+    isAdmin,
+    setRitualParaConjurar,
+    setModalEdit,
+    setRitualEditar,
+    handleEditRitual,
+    handleOnSucess 
+  } = useRituais(idFicha);
+  
 
   if (loading) return <div className="text-center py-10 text-gray-500 animate-pulse">Consultando o Grimório...</div>;
   if (rituais.length === 0) return <div className="text-center py-10 text-gray-500">Nenhum ritual aprendido.</div>;
-
-  const handleEditRitual = (ritual: RitualData) => {
-    setModalEdit(true);
-    setRitualEditar(ritual);
-  }
-  
-  const handleOnSucess = () => {
-    setRefetch(!refetch);
-    setModalEdit(false);
-  };
   
   return (
-    <div className="flex flex-col gap-3 pb-20 max-w-3xl mx-auto">
+    <div className="flex flex-col gap-3 pb-20 max-w-3xl mx-auto"> 
+      {isAdmin &&
+
       <div className="flex items-center justify-between ml-1 mb-1">
             
             <button 
             onClick={() => { 
               setRitualEditar(undefined);
               setModalEdit(true)}}
-            className="flex items-center gap-1 px-3 py-1 bg-harmonia-purple/20 hover:bg-harmonia-purple/40 border border-harmonia-purple text-harmonia-purple rounded text-[10px] uppercase font-bold transition-all active:scale-95"
-            >
+              className="flex items-center gap-1 px-3 py-1 bg-harmonia-purple/20 hover:bg-harmonia-purple/40 border border-harmonia-purple text-harmonia-purple rounded text-[10px] uppercase font-bold transition-all active:scale-95"
+              >
             Adicionar
             </button>
         </div>
+      }
+      
       {rituais.map((ritual, idx) => (
         <RitualCard
           key={idx} 

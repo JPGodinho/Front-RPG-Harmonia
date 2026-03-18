@@ -3,13 +3,16 @@
 import { AtaqueData, DescricaoData, HabilidadeData, InventarioData, ListaDePericias, RitualData } from '@/lib/types';
 import { getToken } from './utils';
 
+const apiPathV1 = process.env.NEXT_PUBLIC_API_KEY_PATH_V1 as string
+const apiPathV2 = process.env.NEXT_PUBLIC_API_KEY_PATH_V2 as string
+
 export async function buscarPericiasDaFicha(idFicha: string): Promise<ListaDePericias | null> {
   const {token } = await getToken();
 
   if (!token) return null;
 
   try {
-    const res = await fetch(`https://harmonia-rpg.onrender.com/api/v1/ficha/${idFicha}/atributos`, {
+    const res = await fetch(`${apiPathV1}/ficha/${idFicha}/atributos`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -36,7 +39,7 @@ export async function buscarDescricao(idFicha: string): Promise<DescricaoData | 
   if (!token) return null;
 
   try {
-    const res = await fetch(`https://harmonia-rpg.onrender.com/api/v1/ficha/${idFicha}/descricao`, {
+    const res = await fetch(`${apiPathV1}/ficha/${idFicha}/descricao`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -59,7 +62,7 @@ export async function buscarRituais(idFicha: string): Promise<RitualData[] | nul
   if (!token) return null;
 
   try {
-    const res = await fetch(`https://harmonia-rpg.onrender.com/api/v2/ficha/${idFicha}/rituais`, {
+    const res = await fetch(`${apiPathV2}/ficha/${idFicha}/rituais`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -85,7 +88,7 @@ export async function buscarHabilidades(idFicha: string): Promise<HabilidadeData
   if (!token) return null;
 
   try {
-    const res = await fetch(`https://harmonia-rpg.onrender.com/api/v1/ficha/${idFicha}/habilidades`, {
+    const res = await fetch(`${apiPathV1}/ficha/${idFicha}/habilidades`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -108,7 +111,7 @@ export async function buscarInventario(idFicha: string): Promise<InventarioData 
   if (!token) return null;
 
   try {
-    const res = await fetch(`https://harmonia-rpg.onrender.com/api/v1/ficha/${idFicha}/inventario`, {
+    const res = await fetch(`${apiPathV1}/ficha/${idFicha}/inventario`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -139,7 +142,7 @@ export async function atualizarFicha(idFicha: string, payload: any) {
   }
 
   try {
-    const res = await fetch(`https://harmonia-rpg.onrender.com/api/v1/ficha/${idFicha}?id-usuario=${idUsuario}`, {
+    const res = await fetch(`${apiPathV1}/ficha/${idFicha}?id-usuario=${idUsuario}`, {
       method: "PATCH",
       headers: {
         "Content-Type": "application/json",
@@ -166,7 +169,7 @@ export async function adicionarItemAoInventario(idFicha: string, item: { nomeIte
   if (!token) return false;
 
   try {
-    const res = await fetch(`https://harmonia-rpg.onrender.com/api/v1/ficha/${idFicha}/inventario/itens`, {
+    const res = await fetch(`${apiPathV1}/ficha/${idFicha}/inventario/itens`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -198,7 +201,7 @@ export async function atualizarItemNoInventario(
 
   try {
     // A URL usa o nome original (codificado para URL, caso tenha espaços)
-    const url = `https://harmonia-rpg.onrender.com/api/v1/ficha/${idFicha}/inventario/itens/${encodeURIComponent(nomeOriginal)}`;
+    const url = `${apiPathV1}/ficha/${idFicha}/inventario/itens/${encodeURIComponent(nomeOriginal)}`;
     
     const res = await fetch(url, {
       method: "PUT",
@@ -228,7 +231,7 @@ export async function deletarItemDoInventario(idFicha: string, nomeItem: string)
 
   try {
     // Codifica o nome do item para a URL (ex: "Kit Médico" -> "Kit%20M%C3%A9dico")
-    const url = `https://harmonia-rpg.onrender.com/api/v1/ficha/${idFicha}/inventario/itens/${encodeURIComponent(nomeItem)}`;
+    const url = `${apiPathV1}/ficha/${idFicha}/inventario/itens/${encodeURIComponent(nomeItem)}`;
     
     const res = await fetch(url, {
       method: "DELETE",
@@ -255,7 +258,7 @@ export async function buscarAtaques(idFicha: string): Promise<AtaqueData[] | nul
   if (!token) return null;
 
   try {
-    const res = await fetch(`https://harmonia-rpg.onrender.com/api/v1/ficha/${idFicha}/ataques`, {
+    const res = await fetch(`${apiPathV1}/ficha/${idFicha}/ataques`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -279,7 +282,7 @@ export async function adicionarRitual(idFicha: string, ritual: RitualData) {
   if (!token) return false;
   
   try {
-    const res = await fetch(`https://harmonia-rpg.onrender.com/api/v2/ficha/${idFicha}/rituais`, {
+    const res = await fetch(`${apiPathV2}/ficha/${idFicha}/rituais`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -311,7 +314,7 @@ export async function atualizarRitual(idFicha: string, ritual: RitualData) {
   }
 
   try {
-    const res = await fetch(`https://harmonia-rpg.onrender.com/api/v2/ficha/${idFicha}/rituais?id-ritual=${ritual.idRitual}`, {
+    const res = await fetch(`${apiPathV2}/ficha/${idFicha}/rituais?id-ritual=${ritual.idRitual}`, {
       method: "PATCH",
       headers: {
         "Content-Type": "application/json",
@@ -343,7 +346,7 @@ export async function deletarRitual(idFicha: string, ritual: RitualData) {
   }
 
   try {
-    const res = await fetch(`https://harmonia-rpg.onrender.com/api/v2/ficha/${idFicha}/rituais?id-ritual=${ritual.idRitual}`, {
+    const res = await fetch(`${apiPathV2}/ficha/${idFicha}/rituais?id-ritual=${ritual.idRitual}`, {
       method: "DELETE",
       headers: {
         "Content-Type": "application/json",
