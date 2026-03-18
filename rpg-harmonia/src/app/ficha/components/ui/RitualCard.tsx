@@ -1,4 +1,4 @@
-import { RitualData } from "@/lib/types";
+import { RitualData, TipoElemento } from "@/lib/types";
 import { useState } from "react";
 import { LinhaDetalhe } from "./LinhaDetalhe";
 import { Pencil } from "lucide-react";
@@ -6,7 +6,7 @@ import { Pencil } from "lucide-react";
 export function RitualCard({ ritual, onUsar, onEdit }: { ritual: RitualData; onUsar: () => void, onEdit: () => void }) {
   const [expandido, setExpandido] = useState(false);
 
-  const getCores = (elemento: string) => {
+  const getCores = (elemento: TipoElemento) => {
     switch (elemento) {
       case "SANGUE": return { border: "border-red-600", bgBadge: "bg-red-900/40 text-red-100", textBtn: "text-red-500" };
       case "MORTE": return { border: "border-gray-500", bgBadge: "bg-gray-700 text-gray-200", textBtn: "text-gray-400" };
