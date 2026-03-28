@@ -65,7 +65,7 @@ export function RitualCard({ ritual, onUsar, onEdit }: { ritual: RitualData; onU
                 onEdit();
             }}
             className="p-2 text-gray-500 hover:text-white hover:bg-white/10 
-             rounded-full transition-colors md:opacity-0 md:group-hover:opacity-100 opacity-100"
+             rounded-full transition-colors lg:opacity-0 lg:group-hover:opacity-100 opacity-100"
         >
             <Pencil size={16} />
         </button>
