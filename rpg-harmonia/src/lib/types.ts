@@ -3,6 +3,14 @@ export interface StatusPontos {
   total: number;
 }
 
+export type UserType = {
+    id: string;
+    nomeUsuario: string;
+    tipoUsuario: 'MESTRE' | 'JOGADOR' | string
+    criadoEm: { seconds: number; nanos: number };
+    avatar?: string;
+}
+
 export interface FichaData {
   id: string;
   imgPersonagem: string;
