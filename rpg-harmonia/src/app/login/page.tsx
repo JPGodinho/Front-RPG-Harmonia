@@ -10,7 +10,7 @@ export default function LoginPage() {
   const [verSenha, setVerSenha] = useState(false);
 
   return (
-    <main className="min-h-screen bg-harmonia-bg text-white flex flex-col items-center gap-10 p-4">
+    <main className="bg-harmonia-bg text-white flex flex-col items-center">
       
       {/* Cabeçalho */}
       <div className="w-full max-w-sm text-center mt-10">
