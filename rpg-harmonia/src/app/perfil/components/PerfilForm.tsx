@@ -68,7 +68,6 @@ export default function PerfilForm({ editandoNome = false, onSucesso }: PerfilFo
                          focus:border-harmonia-purple focus:shadow-[0_0_10px_#8A38F5]
                          transition-all text-white placeholder-gray-600"
               placeholder="Digite a nova senha..."
-              required
             />
             <button
               type="button"
@@ -100,7 +99,6 @@ export default function PerfilForm({ editandoNome = false, onSucesso }: PerfilFo
                          focus:border-harmonia-purple focus:shadow-[0_0_10px_#8A38F5]
                          transition-all text-white placeholder-gray-600"
               placeholder="Confirme a nova senha..."
-              required
             />
             <button
               type="button"

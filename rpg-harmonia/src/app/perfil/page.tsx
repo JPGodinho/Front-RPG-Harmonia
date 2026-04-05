@@ -5,6 +5,8 @@ export default async function PerfilPage({}) {
     const user = await getUserProperties();
 
     return (
-        <PerfilMain user={user} />
+        <div className="md:flex md:flex-col md:items-center w-full">
+            <PerfilMain user={user} />
+        </div>
     )
 }
