@@ -37,8 +37,7 @@ export async function alterarPerfil(prevState: FormState, formData: FormData) {
     return { message: 'Erro ao conectar com o servidor.' };
   }
 
-  console.log(apiPathV1 + `/usuario/${idUsuario}`);
-  
+  console.info(apiPathV1 + `/usuario/${idUsuario}`);
 
   try {
     const res = await fetch(apiPathV1 + `/usuario/${idUsuario}`, {
@@ -54,7 +53,8 @@ export async function alterarPerfil(prevState: FormState, formData: FormData) {
 
     if (!res.ok) {
       console.error("Erro ao alterar usuário:", res.status);
-      return { message: data.message || 'Erro ao salvar as alterações.' };
+      console.error("Erro:" + data.message);
+      return { message: data.error || 'Erro ao salvar as alterações.' };
     }
   } catch (error) {
     console.error("Erro de conexão:", error);
@@ -70,16 +70,12 @@ export async function getUserProperties(): Promise<UserType | null> {
   if (!token) return null;  
 
   try {
-    console.log(apiPathV1 + `/usuario/${idUsuario}`);
-    console.log(token);
-    
     const res = await fetch(apiPathV1 + `/usuario/${idUsuario}`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
         "Authorization": `Bearer ${token}`,
-      },
-      next: { revalidate: 1 },
+      }
     });
 
     const data = await res.json();
