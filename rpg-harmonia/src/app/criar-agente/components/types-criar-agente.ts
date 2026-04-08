@@ -47,12 +47,21 @@ export interface EtapaDescricao {
   objetivo: string;
 }
 
+export interface PericiaPayload {
+  nome: string;
+  treino: number;
+  bonusPonto: number;
+  bonusDescricao: string | null;
+}
+
+// Atualize a EtapaAtributos que você já tem para incluir a linha das pericias:
 export interface EtapaAtributos {
   agilidade: number;
   forca: number;
   intelecto: number;
   presenca: number;
   vigor: number;
+  pericias: Record<string, PericiaPayload[]>; // <--- TEM QUE TER ESSA LINHA
 }
 
 // =============================================

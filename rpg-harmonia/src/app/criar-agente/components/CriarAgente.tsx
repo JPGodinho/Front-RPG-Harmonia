@@ -126,7 +126,7 @@ export default function CriarAgenteWizard() {
           <p className="text-sm text-gray-500 mt-1">
             {etapa === 1 && "Defina as informações fundamentais do seu agente da Ordem."}
             {etapa === 2 && "Dê vida ao seu agente com uma descrição rica."}
-            {etapa === 3 && `Você tem ${72 + Math.floor(((dadosBase.nivelExposicao || 5) - 5) / 5) * 5} pontos para distribuir entre os 5 atributos.`}
+            {etapa === 3 && "Distribua os pontos de atributos conforme as regras."}
           </p>
           <div className="h-px w-full bg-harmonia-purple/40 mt-4 shadow-[0_0_6px_rgba(227,0,255,0.3)]" />
         </div>

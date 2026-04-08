@@ -1,21 +1,13 @@
 'use server';
 
 import { cookies } from 'next/headers';
-import { CriarAgentePayload, EtapaAtributos, EtapaBase, EtapaDescricao } from './components/types-criar-agente';
+import { CriarAgentePayload, EtapaAtributos, EtapaBase, EtapaDescricao, PericiaPayload } from './components/types-criar-agente';
 
 const apiPathV1 = process.env.NEXT_PUBLIC_API_KEY_PATH_V1 as string;
 
 // =============================================
 // Cálculo dos status iniciais baseado nos atributos + NEX
-// Regras do Ordem Paranormal RPG:
-// PV = (Vigor * 4) + (nivelExposicao / 5) * 4
-// PE = (Presença * 4) + (nivelExposicao / 5) * 4  
-// Sanidade = (Presença * 4) + (nivelExposicao / 5) * 4
-// Defesa = 10 + Agilidade
-// Esquiva = Agilidade * 2
-// Deslocamento = 9m (padrão)
 // =============================================
-
 function calcularStatusIniciais(atributos: EtapaAtributos, nivelExposicao: number) {
   const bonusNex = Math.floor(nivelExposicao / 5) * 4;
 
@@ -39,7 +31,6 @@ function calcularStatusIniciais(atributos: EtapaAtributos, nivelExposicao: numbe
 // =============================================
 // Monta o payload completo para a API
 // =============================================
-
 function montarPayload(
   base: EtapaBase,
   atributos: EtapaAtributos
@@ -57,19 +48,17 @@ function montarPayload(
     afinidade: base.afinidade,
     nivelExposicao: base.nivelExposicao,
     esforcoPorRodada: base.esforcoPorRodada,
-    // Atributos
     agilidade: atributos.agilidade,
     forca: atributos.forca,
     intelecto: atributos.intelecto,
     presenca: atributos.presenca,
     vigor: atributos.vigor,
-    // Status calculados
     ...status,
   };
 }
 
 // =============================================
-// Server Action principal
+// Funções Secundárias (Descrição e Perícias)
 // =============================================
 async function salvarDescricao(idFicha: string, descricao: EtapaDescricao, token: string) {
   try {
@@ -82,13 +71,42 @@ async function salvarDescricao(idFicha: string, descricao: EtapaDescricao, token
       body: JSON.stringify(descricao),
     });
 
+    if (!res.ok) {
+        const textErro = await res.text();
+        console.error(`[ERRO PASSO 2 - DESCRIÇÃO] Status: ${res.status} | Resposta:`, textErro);
+    }
     return res.ok;
   } catch (error) {
-    console.error("Erro ao salvar descrição:", error);
+    console.error("[ERRO CATCH - DESCRIÇÃO]:", error);
     return false;
   }
 }
 
+async function salvarPericias(idFicha: string, pericias: Record<string, PericiaPayload[]>, token: string) {
+  try {
+    const res = await fetch(`${apiPathV1}/ficha/${idFicha}/atributos`, {
+      method: "POST", // ou PUT, dependendo de como a API Java foi feita
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`,
+      },
+      body: JSON.stringify(pericias),
+    });
+
+    if (!res.ok) {
+        const textErro = await res.text();
+        console.error(`[ERRO PASSO 3 - PERÍCIAS] Status: ${res.status} | Resposta:`, textErro);
+    }
+    return res.ok;
+  } catch (error) {
+    console.error("[ERRO CATCH - PERÍCIAS]:", error);
+    return false;
+  }
+}
+
+// =============================================
+// Server Action principal
+// =============================================
 export async function criarAgente(
   base: EtapaBase,
   descricao: EtapaDescricao,
@@ -98,43 +116,56 @@ export async function criarAgente(
   const token = cookieStore.get("auth_token")?.value;
   const idUsuario = cookieStore.get("user_id")?.value;
 
-  if (!token || !idUsuario) {
-    return { sucesso: false, mensagem: "Sessão expirada. Faça login novamente." };
-  }
+  if (!token || !idUsuario) return { sucesso: false, mensagem: "Sessão expirada." };
 
   // Passo 1: Criar a ficha básica
   const payloadFicha = montarPayload(base, atributos);
   
   try {
+    console.log("=========================================");
+    console.log("🚀 INICIANDO CRIAÇÃO DO AGENTE...");
+    // console.log("Payload Base:", JSON.stringify(payloadFicha, null, 2)); // Descomente se quiser ver o que está enviando
+
     const resFicha = await fetch(`${apiPathV1}/ficha?id-usuario=${idUsuario}`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${token}`,
-      },
+      method: "POST", 
+      headers: { "Content-Type": "application/json", "Authorization": `Bearer ${token}` },
       body: JSON.stringify(payloadFicha),
     });
 
-    const dataFicha = await resFicha.json();
+    // Pega como texto para evitar crash no .json() caso a API devolva um HTML de erro
+    const responseText = await resFicha.text();
+    let dataFicha;
+    try { dataFicha = JSON.parse(responseText); } catch (e) { dataFicha = responseText; }
 
     if (!resFicha.ok) {
-      return { sucesso: false, mensagem: dataFicha.message || "Erro ao criar ficha básica." };
+        console.error(`[ERRO PASSO 1 - FICHA BASE] Status: ${resFicha.status}`);
+        console.error("Detalhes do erro:", dataFicha);
+        return { sucesso: false, mensagem: dataFicha?.message || "Erro ao criar ficha." };
     }
 
-    const idGerado = dataFicha.id;
+    const idGerado = dataFicha.id || dataFicha; 
+    console.log(`✅ Ficha base criada! ID gerado: ${idGerado}`);
 
-    // Passo 2: Se a ficha foi criada, enviamos a descrição para o endpoint dela
+    // Passo 2: Salvar Descrição
+    console.log("Enviando Descrição...");
     const descSucesso = await salvarDescricao(idGerado, descricao, token);
+    if (descSucesso) console.log("✅ Descrição salva com sucesso!");
 
-    if (!descSucesso) {
-       console.warn("Ficha criada, mas houve erro ao salvar a descrição.");
-       // Opcional: retornar sucesso mesmo assim, informando que a descrição falhou
+    // Passo 3: Salvar Perícias
+    console.log("Enviando Perícias...");
+    const periciasSucesso = await salvarPericias(idGerado, atributos.pericias, token);
+    if (periciasSucesso) {
+        console.log("✅ Perícias salvas com sucesso!");
+    } else {
+        console.warn("⚠️ Falha ao salvar as perícias.");
     }
 
+    console.log("🎉 PROCESSO FINALIZADO!");
+    console.log("=========================================");
     return { sucesso: true, id: idGerado };
 
   } catch (error) {
-    console.error("Erro no processo de criação:", error);
-    return { sucesso: false, mensagem: "Erro ao conectar com o servidor." };
+    console.error("🔥 ERRO FATAL NO SERVIDOR NEXT.JS:", error);
+    return { sucesso: false, mensagem: "Erro interno no servidor." };
   }
 }
