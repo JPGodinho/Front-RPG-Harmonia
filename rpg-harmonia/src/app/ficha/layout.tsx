@@ -8,7 +8,7 @@ export default function FichaLayout({
   return (
     <div>
       <HeaderFicha />
-      <main className="mt-4">
+      <main className="flex justify-center mt-4">
         {children}
       </main>
     </div>
