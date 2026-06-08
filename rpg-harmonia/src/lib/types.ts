@@ -4,12 +4,21 @@ export interface StatusPontos {
 }
 
 export type UserType = {
-    id: string;
-    nomeUsuario: string;
-    tipoUsuario: 'MESTRE' | 'JOGADOR' | string
-    criadoEm: { seconds: number; nanos: number };
-    avatar?: string;
+    uid: string,
+    username: string,
+    email: string,
+    telefone: string | null,
+    userRole: "USER" | "ADMIN" | null,
+    photoUrl: string
 }
+
+export type AuthResponse = {
+  uid: string;
+  username: string;
+  token: string;
+  refreshToken: string;
+  userRole: 'USER' | 'ADMIN';
+};
 
 export interface FichaData {
   id: string;

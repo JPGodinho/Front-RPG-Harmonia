@@ -15,6 +15,7 @@ import {
   SidebarFooter,
   SidebarRail,
 } from "@/components/ui/sidebar"
+import { UserType } from "@/lib/types"
 
 
 const data = { 
@@ -41,14 +42,14 @@ const data = {
 }
 
 export function AppSidebar({
-  username,
+  userProps,
   ...props
-}: React.ComponentProps<typeof Sidebar> & { username: string }) {
+}: React.ComponentProps<typeof Sidebar> &  { userProps : UserType } ) {
 
   const user = {
-    name: username,
-    email: "",
-    avatar: "",
+    name: userProps.username,
+    email: userProps.email,
+    avatar: userProps.photoUrl,
   }
 
   return (

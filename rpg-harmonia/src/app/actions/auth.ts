@@ -1,148 +1,163 @@
 'use server';
 
-import { LoginFormSchema, FormState, SignupFormSchema } from '@/lib/definitions';
+import { LoginFormSchema, SignupFormSchema, FormState } from '@/lib/definitions';
+import { AuthResponse } from '@/lib/types';
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 
+const API_URL = process.env.NEXT_PUBLIC_API_V1_URL;
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Helpers
+// ─────────────────────────────────────────────────────────────────────────────
+
+export async function salvarSessao(data: AuthResponse) {
+  const cookieStore = await cookies();
+  const opts = {
+    secure: process.env.NODE_ENV === 'production',
+    maxAge: 60 * 60, // 1 hora — tempo de vida do idToken do Firebase
+    path: '/',
+  };
+
+  // httpOnly — token de autenticação protegido do JS do cliente
+  cookieStore.set('auth_token', data.token, { ...opts, httpOnly: true });
+  cookieStore.set('refresh_token', data.refreshToken, { ...opts, httpOnly: true });
+
+  // Visíveis ao cliente para uso na UI
+  cookieStore.set('user_id',   data.uid,      opts);
+  cookieStore.set('user_name', data.username, opts);
+  cookieStore.set('user_role', data.userRole, opts);
+}
+
+async function limparSessao() {
+  const cookieStore = await cookies();
+  cookieStore.delete('auth_token');
+  cookieStore.delete('refresh_token');
+  cookieStore.delete('user_id');
+  cookieStore.delete('user_name');
+  cookieStore.delete('user_role');
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Login com e-mail e senha
+// ─────────────────────────────────────────────────────────────────────────────
+
 export async function login(prevState: FormState, formData: FormData) {
-  // 1. Valida os campos do formulário antes de enviar
   const validatedFields = LoginFormSchema.safeParse({
-    nomeUsuario: formData.get('nomeUsuario'),
-    senha: formData.get('senha'),
+    email:    formData.get('email'),
+    password: formData.get('password'),
   });
 
-  // Se a validação falhar, devolve os erros para o front
   if (!validatedFields.success) {
-    return {
-      errors: validatedFields.error.flatten().fieldErrors,
-    };
+    return { errors: validatedFields.error.flatten().fieldErrors };
   }
 
-  const { nomeUsuario, senha } = validatedFields.data;
+  const { email, password } = validatedFields.data;
 
   try {
-    // 2. Chama a API Real
-    const response = await fetch("https://harmonia-rpg.onrender.com/api/v1/auth/entrar", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ nomeUsuario, senha }),
+    const response = await fetch(`${API_URL}/auth/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password }),
     });
 
     const data = await response.json();
 
     if (!response.ok) {
-      // Retorna a mensagem de erro da API ou uma genérica
-      return { message: data.message || 'Usuário ou senha incorretos.' };
+      return { message: data.error || 'E-mail ou senha incorretos.' };
     }
 
-    // 3. Sucesso! Configura o Cookie de Autenticação
-    // "data.token" é o JWT que recebemos da resposta
-    const cookieStore = await cookies();
-    
-    cookieStore.set('auth_token', data.token, {
-      httpOnly: true, // Segurança: JS do front não acessa
-      secure: process.env.NODE_ENV === 'production',
-      maxAge: 60 * 60 * 24, // 1 dia de validade
-      path: '/',
-    });
+    await salvarSessao(data as AuthResponse);
 
-    // Opcional: Você pode querer salvar o nomeUsuario em um cookie visível 
-    // para mostrar no Dashboard sem precisar de localStorage no login
-    cookieStore.set('user_name', data.nomeUsuario, {
-       maxAge: 60 * 60 * 24, 
-       path: '/' 
-    });
-    
-    // Salva o ID também se necessário para buscar fichas
-    cookieStore.set('user_id', data.id, {
-        maxAge: 60 * 60 * 24,
-        path: '/'
-    });
-    
-    // Salva o tipoUsuario também para buscar fichas
-    cookieStore.set('user_type', data.tipoUsuario, {
-        maxAge: 60 * 60 * 24,
-        path: '/'
-    });
-
-  } catch (error) {
-    console.error("Erro no login:", error);
+  } catch {
     return { message: 'Erro ao conectar com o servidor.' };
   }
 
-  // 4. Redireciona para o Dashboard (tem que ser fora do try/catch)
   redirect('/dashboard');
 }
 
-export async function logout() {
-  const cookieStore = await cookies();
-  
-  // Apaga os cookies de forma segura no servidor
-  cookieStore.delete('auth_token');
-  cookieStore.delete('user_id');
-  cookieStore.delete('user_name');
-
-  // Redireciona para o login
-  redirect('/login');
-}
+// ─────────────────────────────────────────────────────────────────────────────
+// Cadastro com e-mail e senha
+// ─────────────────────────────────────────────────────────────────────────────
 
 export async function signup(prevState: FormState, formData: FormData) {
-  // 1. Valida os campos
+  const rawTelefone = formData.get('telefone') as string;
+
   const validatedFields = SignupFormSchema.safeParse({
-    nomeUsuario: formData.get('nomeUsuario'),
-    senha: formData.get('senha'),
-    tipoUsuario: formData.get('tipoUsuario'),
+    username:  formData.get('username'),
+    email:     formData.get('email'),
+    password:  formData.get('password'),
+    telefone:  rawTelefone || undefined,
   });
 
   if (!validatedFields.success) {
-    return {
-      errors: validatedFields.error.flatten().fieldErrors,
-    };
+    return { errors: validatedFields.error.flatten().fieldErrors };
   }
 
-  const { nomeUsuario, senha, tipoUsuario } = validatedFields.data;
+  const { username, email, password, telefone } = validatedFields.data;
 
   try {
-    // 2. Chama a API de Cadastro
-    const response = await fetch("https://harmonia-rpg.onrender.com/api/v1/auth/cadastrar", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ nomeUsuario, senha, tipoUsuario }),
+    const response = await fetch(`${API_URL}/auth/signup`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        username,
+        email,
+        password,
+        telefone: telefone || null,
+        userRole: 'USER',
+      }),
     });
 
     const data = await response.json();
 
     if (!response.ok) {
-      return { message: data.message || 'Erro ao criar conta. Tente outro nome de usuário.' };
+      return { message: data.error || 'Erro ao criar conta. Tente novamente.' };
     }
 
-    // 3. Sucesso! Configura os cookies (IGUAL AO LOGIN)
-    const cookieStore = await cookies();
-    
-    // Cookie de Segurança
-    cookieStore.set('auth_token', data.token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      maxAge: 60 * 60 * 24,
-      path: '/',
-    });
+    await salvarSessao(data as AuthResponse);
 
-    // Cookies de Dados (ID e Nome)
-    cookieStore.set('user_name', data.nomeUsuario, {
-       maxAge: 60 * 60 * 24, 
-       path: '/' 
-    });
-    
-    cookieStore.set('user_id', data.id, {
-        maxAge: 60 * 60 * 24,
-        path: '/'
-    });
-
-  } catch (error) {
-    console.error("Erro no cadastro:", error);
+  } catch {
     return { message: 'Erro de conexão com o servidor.' };
   }
 
-  // 4. Redireciona
   redirect('/dashboard');
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Login / Cadastro com Google
+// Chamado pelo GoogleButton (client component) após o popup do Google
+// O idToken vem do Firebase client SDK — a API valida e retorna a sessão
+// ─────────────────────────────────────────────────────────────────────────────
+
+export async function autenticarComGoogle(idToken: string) {
+  try {
+    const response = await fetch(`${API_URL}/auth/login/google`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ idToken }),
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      return { error: data.error || 'Erro ao autenticar com Google.' };
+    }
+
+    await salvarSessao(data as AuthResponse);
+
+  } catch {
+    return { error: 'Erro de conexão com o servidor.' };
+  }
+
+  redirect('/dashboard');
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Logout
+// ─────────────────────────────────────────────────────────────────────────────
+
+export async function logout() {
+  await limparSessao();
+  redirect('/login');
 }

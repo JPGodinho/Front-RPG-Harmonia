@@ -5,7 +5,7 @@ import { getToken } from "../ficha/[id]/utils";
 import { FormState, PerfilFormSchema } from "@/lib/definitions";
 import { redirect } from "next/navigation";
 
-const apiPathV1 = process.env.NEXT_PUBLIC_API_KEY_PATH_V1 as string
+const apiPathV1 = process.env.NEXT_PUBLIC_API_V1_URL as string
 
 export async function alterarPerfil(prevState: FormState, formData: FormData) {
   const rawNome = formData.get('nomeUsuario') as string | null;
@@ -40,7 +40,7 @@ export async function alterarPerfil(prevState: FormState, formData: FormData) {
   console.info(apiPathV1 + `/usuario/${idUsuario}`);
 
   try {
-    const res = await fetch(apiPathV1 + `/usuario/${idUsuario}`, {
+    const res = await fetch(apiPathV1 + `/user/${idUsuario}`, {
       method: "PATCH",
       headers: {
         "Content-Type": "application/json",
@@ -70,7 +70,7 @@ export async function getUserProperties(): Promise<UserType | null> {
   if (!token) return null;  
 
   try {
-    const res = await fetch(apiPathV1 + `/usuario/${idUsuario}`, {
+    const res = await fetch(apiPathV1 + `/user/${idUsuario}`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -79,7 +79,7 @@ export async function getUserProperties(): Promise<UserType | null> {
     });
 
     const data = await res.json();
-
+    
     if (!res.ok) {
       console.error("Erro ao buscar usuário:", data);
       return null;

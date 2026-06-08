@@ -1,21 +1,32 @@
 import { z } from 'zod';
 
-// Schema do Login (Já existia)
 export const LoginFormSchema = z.object({
-  nomeUsuario: z.string().min(1, { message: 'Digite seu usuário.' }).trim(),
-  senha: z.string().min(1, { message: 'Digite sua senha.' }),
+  email: z
+    .string()
+    .email({ message: 'Informe um e-mail válido.' }),
+  password: z
+    .string()
+    .min(6, { message: 'A senha deve ter pelo menos 6 caracteres.' }),
 });
 
-// Schema do Cadastro
 export const SignupFormSchema = z.object({
-  nomeUsuario: z.string().min(1, { message: 'Escolha um nome de usuário.' }).trim(),
-  senha: z.string().min(4, { message: 'A senha deve ter pelo menos 4 caracteres.' }),
-  tipoUsuario: z.enum(['JOGADOR', 'MESTRE'], { message: 'Selecione um tipo válido.' }),
+  username: z
+    .string()
+    .min(3, { message: 'O nome deve ter pelo menos 3 caracteres.' })
+    .max(50, { message: 'O nome deve ter no máximo 50 caracteres.' }),
+  email: z
+    .string()
+    .email({ message: 'Informe um e-mail válido.' }),
+  password: z
+    .string()
+    .min(6, { message: 'A senha deve ter pelo menos 6 caracteres.' }),
+  telefone: z
+    .string()
+    .regex(/^\+?[0-9]{13}$/, { message: 'Telefone inválido. Use o formato +5511999999999.' })
+    .optional()
+    .or(z.literal('')),
 });
 
-// Schema do Perfil — todos os campos são opcionais,
-// mas quando preenchidos seguem as regras de validação.
-// O refine garante que confirmSenha bate com senha (apenas quando senha foi informada).
 export const PerfilFormSchema = z
   .object({
     nomeUsuario: z
@@ -49,15 +60,7 @@ export const PerfilFormSchema = z
     path: ['_form'],
   });
 
-export type FormState =
-  | {
-      errors?: {
-        nomeUsuario?: string[];
-        senha?: string[];
-        confirmSenha?: string[];
-        tipoUsuario?: string[];
-        _form?: string[];
-      };
-      message?: string;
-    }
-  | undefined;
+export type FormState = {
+  errors?: Record<string, string[]>;
+  message?: string;
+} | undefined;
